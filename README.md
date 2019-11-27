@@ -1,2 +1,2 @@
 # PinEventz
-PinEventz is an event management system.
+\Official PinEventz Backend API.
