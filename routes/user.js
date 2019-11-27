@@ -126,6 +126,8 @@ router.post('/board',  function (req,res) {
             boardUrl:req.body.boardUrl,
             boardName:req.body.boardName,
             boardDescription:req.body.boardDescription,
+            boardCategory:req.body.boardCategory,
+            boardStatus:req.body.boardStatus,
             // creator:author,
             created_dt:Date.now(),
         });
@@ -144,9 +146,9 @@ router.post('/board',  function (req,res) {
 
 // })
 // Function to get board
-router.get('/board', function (req,res) {
+router.get('boards', function (req,res) {
   Event.find()
-  .select('boardName boardDescription')
+  .select('finishDate startDate fullDes shortDes address eventName eventUrl organizer.username organizer._id')
   .exec()
         .then(result => {
                return res.status(200).json(result);
@@ -159,18 +161,18 @@ router.get('/board', function (req,res) {
 // Function to create event
 // isValidUser,
 router.post('/event', uploadEvent.single('image'),  function (req,res) {
-
+  cloudinary.v2.uploader.upload(req.file.image, function (err,result) {
     if (err) {
         return res.status(501).json(err);
     } else {
-        const organizer = {
-          id : req.user._id,
-          username : req.user.username
-        }
+        // const organizer = {
+        //   id : req.user._id,
+        //   username : req.user.username
+        // }
         req.body.image = result.secure_url;
         const event = new Event ({
-            organizer:organizer,
-            //eventUrl:req.body.image,
+            //  organizer:organizer,
+            eventUrl:req.body.image,
             eventName:req.body.eventName,
             address:req.body.address,
             shortDes:req.body.shortDes,
@@ -190,7 +192,7 @@ router.post('/event', uploadEvent.single('image'),  function (req,res) {
             }
         })
     }
-
+})
 })
 // Function to get all event
 router.get('/event', function (req,res) {

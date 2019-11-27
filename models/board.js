@@ -12,6 +12,12 @@ const BoardSchema=mongoose.Schema({
     boardDescription:{
         type:String,
     },
+    boardCategory:{
+        type:String,
+    },
+    boardStatus:{
+        type:String,
+    },
     created_dt:{
         type:Date,
     	require:true
@@ -23,6 +29,6 @@ const BoardSchema=mongoose.Schema({
             ref:  "Event"
         }
     ]
-    // Event added to a board ends 
+    // Event added to a board ends
 });
 module.exports=mongoose.model('Board',BoardSchema);
