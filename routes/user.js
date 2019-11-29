@@ -10,6 +10,7 @@ const My_Interest=require('../models/my_interest');
 const Board = require('../models/board');
 const Event = require('../models/event');
 const Comment = require('../models/comment');
+const user = require('../controllers/user.controller');
 
 // section to intialize cloudinary
 cloudinary.config({
@@ -122,19 +123,23 @@ router.post('/board',  function (req,res) {
         //   username: req.user.username,
         //   id:req.user._id
         // }
+        // const author = {
+        //     username: req.user.username,
+        //     id:req.users._id
+        //   }
         const board = new Board ({
             boardUrl:req.body.boardUrl,
             boardName:req.body.boardName,
             boardDescription:req.body.boardDescription,
-            boardCategory:req.body.boardCategory,
-            boardStatus:req.body.boardStatus,
-            // creator:author,
+            boardCategory: req.body.boardCategory,
+            //creator:author,
             created_dt:Date.now(),
         });
         board.save(function (err) {
-            if (err) {
+          if (err) {
                 return res.status(501).json(err);
-            } else {
+            }
+            else {
                 return res.status(200).json({
                   // result:result,
                   message:'You successfully create a board'
@@ -144,11 +149,52 @@ router.post('/board',  function (req,res) {
     // }
   })
 
+  //delete board
+router.delete('/board/:Id', function(req, res) {
+  const id = req.params.Id;
+    Board.findByIdAndDelete(id)
+    .exec()
+    .then(doc=>{
+       if(doc){
+        res.status(200).json(doc);
+       }else{
+        res.status(200).json({
+          message:'Invalid Id Number'
+        });
+       }
+      })
+      .catch(err=>{
+        res.status(500).json({
+            error:err
+         });
+      });
+
+})
+//get board by id
+router.get('/board/:Id', function (req,res) {
+  const id = req.params.Id;
+    Board.findById(id)
+    .exec()
+    .then(doc=>{
+       if(doc){
+        res.status(200).json(doc);
+       }else{
+        res.status(200).json({
+          message:'Invalid Id Number'
+        });
+       }
+      })
+      .catch(err=>{
+        res.status(500).json({
+            error:err
+         });
+      });
+})
+
 // })
 // Function to get board
-router.get('boards', function (req,res) {
-  Event.find()
-  .select('finishDate startDate fullDes shortDes address eventName eventUrl organizer.username organizer._id')
+router.get('/board', function (req,res) {
+  Board.find()
   .exec()
         .then(result => {
                return res.status(200).json(result);
@@ -158,20 +204,21 @@ router.get('boards', function (req,res) {
         })
 
 })
+
 // Function to create event
 // isValidUser,
 router.post('/event', uploadEvent.single('image'),  function (req,res) {
-  cloudinary.v2.uploader.upload(req.file.image, function (err,result) {
+
     if (err) {
         return res.status(501).json(err);
     } else {
-        // const organizer = {
-        //   id : req.user._id,
-        //   username : req.user.username
-        // }
+        const organizer = {
+          id : req.user._id,
+          username : req.user.username
+        }
         req.body.image = result.secure_url;
         const event = new Event ({
-            //  organizer:organizer,
+            //organizer:organizer,
             eventUrl:req.body.image,
             eventName:req.body.eventName,
             address:req.body.address,
@@ -192,7 +239,7 @@ router.post('/event', uploadEvent.single('image'),  function (req,res) {
             }
         })
     }
-})
+
 })
 // Function to get all event
 router.get('/event', function (req,res) {

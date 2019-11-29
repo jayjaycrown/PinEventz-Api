@@ -15,9 +15,6 @@ const BoardSchema=mongoose.Schema({
     boardCategory:{
         type:String,
     },
-    boardStatus:{
-        type:String,
-    },
     created_dt:{
         type:Date,
     	require:true
