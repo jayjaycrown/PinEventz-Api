@@ -218,7 +218,7 @@ router.post('/event', uploadEvent.single('image'),  function (req,res) {
         }
         req.body.image = result.secure_url;
         const event = new Event ({
-            //organizer:organizer,
+            organizer:organizer,
             eventUrl:req.body.image,
             eventName:req.body.eventName,
             address:req.body.address,
