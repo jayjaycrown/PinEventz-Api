@@ -1,2 +1,2 @@
 # PinEventz
-\Official PinEventz Backend API.
+Official PinEventz Backend API.
