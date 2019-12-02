@@ -11,7 +11,7 @@ const Board = require('../models/board');
 const Event = require('../models/event');
 const Comment = require('../models/comment');
 const user = require('../controllers/user.controller');
-require('./config/passportConfig');
+require('../config/passportConfig');
 
 // section to intialize cloudinary
 cloudinary.config({
@@ -125,10 +125,6 @@ router.post('/board', uploadBoard.single('image'),  function (req,res) {
           username: req.user.username,
           id:req.user._id
         }
-        const author = {
-            username: req.user.username,
-            id:req.users._id
-          }
         const board = new Board ({
             boardUrl:req.body.image,
             boardName:req.body.boardName,

@@ -10,6 +10,7 @@ const morgan = require('morgan');
 
 const rtsIndex = require('./routes/index.router');
 const userIndex = require('./routes/user');
+const PORT = process.env.PORT || 5000
 
 var app = express();
 
@@ -33,4 +34,4 @@ app.use((err, req, res, next) => {
 });
 
 // start server
-app.listen(process.env.PORT, () => console.log(`Server started at port : ${process.env.PORT}`));
+app.listen(PORT, () => console.log(`Server started at port : ${PORT}`));
