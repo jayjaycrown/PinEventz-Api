@@ -17,7 +17,7 @@ var EventSchema=mongoose.Schema({
     fullDes:{
         type:String,
         require:true
-    }, 
+    },
     eventUrl:{
         type:String,
         require:true

@@ -64,7 +64,7 @@ router.post('/interest',   function (req,res) {
           return res.status(501).json()
         }else{
          return res.status(200).json({
-            message:'Interest as been created',
+            message:'Interest has been created Succesfully',
           })
         };
       })
@@ -92,7 +92,7 @@ router.post('/select',    function (req,res) {
       } else {
         My_Interest.create( {interest:req.body.interest},  function (err, inter) {
           if (err) {
-             res.status(501).json(err);
+            return res.status(501).json(err);
           } else {
             // section to add the user detail
              inter.chooser.id = req.user._id;
@@ -110,29 +110,28 @@ router.post('/select',    function (req,res) {
   })
 })
 // Function to create board to pin event to
-// uploadBoard.single('image'),
-router.post('/board',  function (req,res) {
+router.post('/board', uploadBoard.single('image'),  function (req,res) {
   // console.log(req.file);
-  // cloudinary.v2.uploader.upload(req.file.path, function (err,result) {
-    // if (err) {
-      // console.log(err);
-        // return res.status(501).json(err);
-    // } else {
-        // req.body.image = result.secure_url;
-        // const author = {
-        //   username: req.user.username,
-        //   id:req.user._id
-        // }
-        // const author = {
-        //     username: req.user.username,
-        //     id:req.users._id
-        //   }
+  cloudinary.v2.uploader.upload(req.file.path, function (err,result) {
+    if (err) {
+      console.log(err);
+        return res.status(501).json(err);
+    } else {
+        req.body.image = result.secure_url;
+        const author = {
+          username: req.user.username,
+          id:req.user._id
+        }
+        const author = {
+            username: req.user.username,
+            id:req.users._id
+          }
         const board = new Board ({
-            boardUrl:req.body.boardUrl,
+            boardUrl:req.body.image,
             boardName:req.body.boardName,
             boardDescription:req.body.boardDescription,
             boardCategory: req.body.boardCategory,
-            //creator:author,
+            creator:author,
             created_dt:Date.now(),
         });
         board.save(function (err) {
@@ -141,12 +140,12 @@ router.post('/board',  function (req,res) {
             }
             else {
                 return res.status(200).json({
-                  // result:result,
+                  result:result,
                   message:'You successfully create a board'
                 });
             }
         })
-    // }
+    }
   })
 
   //delete board
@@ -207,19 +206,17 @@ router.get('/board', function (req,res) {
 
 // Function to create event
 // isValidUser,
-router.post('/event', uploadEvent.single('image'),  function (req,res) {
+router.post('/event',  function (req,res) {
 
-    if (err) {
-        return res.status(501).json(err);
-    } else {
-        const organizer = {
-          id : req.user._id,
-          username : req.user.username
-        }
+
+        // const organizer = {
+        //   id : req.user._id,
+        //   username : req.user.username
+        // }
         req.body.image = result.secure_url;
         const event = new Event ({
-            organizer:organizer,
-            eventUrl:req.body.image,
+           // organizer:organizer,
+            eventUrl:req.body.eventUrl,
             eventName:req.body.eventName,
             address:req.body.address,
             shortDes:req.body.shortDes,
@@ -233,12 +230,12 @@ router.post('/event', uploadEvent.single('image'),  function (req,res) {
                 return res.status(501).json(err);
             } else {
                 return res.status(200).json({
-                  result:result,
+                  //result:result,
                   message:'You successfully create an event'
                 });
             }
         })
-    }
+
 
 })
 // Function to get all event

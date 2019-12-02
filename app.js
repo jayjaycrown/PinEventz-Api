@@ -6,6 +6,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const passport = require('passport');
+const morgan = require('morgan');
 
 const rtsIndex = require('./routes/index.router');
 const userIndex = require('./routes/user');
@@ -13,6 +14,7 @@ const userIndex = require('./routes/user');
 var app = express();
 
 // middleware
+app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(cors());
 app.use(passport.initialize());

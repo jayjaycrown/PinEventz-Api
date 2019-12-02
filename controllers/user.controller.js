@@ -65,3 +65,28 @@ module.exports.userProfile = (req, res, next) =>{
         }
     );
 }
+
+module.exports.interest =   (req,res, next) => {
+    User.findOne({ _id: req._id }, function (err, user) {
+        if (!user) {
+          return res.status(500).json("Oops"+err);
+        } else {
+          My_Interest.create( {interest:req.body.interest},  function (err, inter) {
+            if (err) {
+              return res.status(501).json(err);
+            } else {
+              // section to add the user detail
+               inter.chooser.id = req.user._id;
+               inter.chooser.username = req.user.username;
+               inter.save()
+               user.selected_interest.push(inter);
+               user.save()
+              return res.status(200).json({
+                //result:user,
+                message:'You have successfully select your area of interest'
+              });
+            }
+          })
+        }
+    })
+  }
