@@ -11,6 +11,7 @@ const Board = require('../models/board');
 const Event = require('../models/event');
 const Comment = require('../models/comment');
 const user = require('../controllers/user.controller');
+require('./config/passportConfig');
 
 // section to intialize cloudinary
 cloudinary.config({
