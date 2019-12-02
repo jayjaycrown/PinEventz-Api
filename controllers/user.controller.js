@@ -27,7 +27,7 @@ module.exports.register = (req, res, next) => {
     user.save((err, doc) => {
         if (!err){
             res.send(doc);
-           
+
         }
 
         else {
@@ -67,13 +67,17 @@ module.exports.authenticate = (req, res, next) => {
 }
 
 module.exports.userProfile = (req, res, next) =>{
-    User.findOne({ _id: req._id },
-        (err, user) => {
-            if (!user)
-                return res.status(404).json({ status: false, message: 'User record not found.' });
-            else return res.status(200).json({ status: true, user : _.pick(user,['fullName','email'])});
-        }
-    );
+  var user = req.user;
+
+   (err, user) => {
+    if (!user){
+          return res.status(404).json({ status: false, message: 'User record not found.' })}
+
+    else {
+      var user = req.user;
+      return res.render('profile', { title: 'profile', user: user });
+  }
+}
 }
 
 module.exports.interest =   (req,res, next) => {
