@@ -3,6 +3,7 @@ require('./models/db');
 require('./config/passportConfig');
 
 const express = require('express');
+const expressSession = require('express-session');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const passport = require('passport');
@@ -13,12 +14,26 @@ const userIndex = require('./routes/user');
 const PORT = process.env.PORT || 5000
 
 var app = express();
+app.use(expressSession({
+    secret: 'cookie_secret',
+      name: 'cookie_name',
+      proxy: true,
+      resave: true,
+      saveUninitialized: true
+  }));
 
 // middleware
 app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(cors());
 app.use(passport.initialize());
+app.use(passport.session({
+    secret: 'cookie_secret',
+    name: 'cookie_name',
+    proxy: true,
+    resave: true,
+    saveUninitialized: true
+}));
 app.use('/api', rtsIndex);
 app.use('/user', userIndex);
 
