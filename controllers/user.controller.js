@@ -55,11 +55,14 @@ module.exports.authenticate = (req, res, next) => {
            {
               expiresIn: process.env.JWT_EXP
            });
+           console.log("Hello " + req.user.username);
           return res.status(200).json({
             message: "Authentication Successful",
             token: token,
-            "token": token
+            "token": token,
+
           })
+
       }
         // unknown user or wrong password
         else return res.status(404).json(info);

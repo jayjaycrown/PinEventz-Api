@@ -24,6 +24,14 @@ app.use('/user', userIndex);
 
 // Make Images "Uploads" Folder Publicly Available
 app.use('/public', express.static('uploads'));
+app.use(function(req, res, next){
+    res.locals.user = req.user;
+    next();
+  });
+  app.get('*', function(req, res,next){
+    res.locals.user = req.user || null;
+    next();
+})
 
 // error handler
 app.use((err, req, res, next) => {
