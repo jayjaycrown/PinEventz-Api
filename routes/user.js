@@ -110,6 +110,8 @@ router.post('/select',    function (req,res) {
   })
 })
 // Function to create board to pin event to
+// uploadBoard.single('image'),
+// Function to create board to pin event to
 router.post('/board', uploadBoard.single('image'),  function (req,res) {
   // console.log(req.file);
   cloudinary.v2.uploader.upload(req.file.path, function (err,result) {
@@ -147,6 +149,7 @@ router.post('/board', uploadBoard.single('image'),  function (req,res) {
         })
     }
   })
+})
 
   //delete board
 router.delete('/board/:Id', function(req, res) {
