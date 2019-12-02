@@ -110,29 +110,28 @@ router.post('/select',    function (req,res) {
   })
 })
 // Function to create board to pin event to
-// uploadBoard.single('image'),
-router.post('/board',  function (req,res) {
+router.post('/board', uploadBoard.single('image'),  function (req,res) {
   // console.log(req.file);
-  // cloudinary.v2.uploader.upload(req.file.path, function (err,result) {
-    // if (err) {
-      // console.log(err);
-        // return res.status(501).json(err);
-    // } else {
-        // req.body.image = result.secure_url;
-        // const author = {
-        //   username: req.user.username,
-        //   id:req.user._id
-        // }
-        // const author = {
-        //     username: req.user.username,
-        //     id:req.users._id
-        //   }
+  cloudinary.v2.uploader.upload(req.file.path, function (err,result) {
+    if (err) {
+      console.log(err);
+        return res.status(501).json(err);
+    } else {
+        req.body.image = result.secure_url;
+        const author = {
+          username: req.user.username,
+          id:req.user._id
+        }
+        const author = {
+            username: req.user.username,
+            id:req.users._id
+          }
         const board = new Board ({
-            boardUrl:req.body.boardUrl,
+            boardUrl:req.body.image,
             boardName:req.body.boardName,
             boardDescription:req.body.boardDescription,
             boardCategory: req.body.boardCategory,
-            //creator:author,
+            creator:author,
             created_dt:Date.now(),
         });
         board.save(function (err) {
@@ -141,12 +140,12 @@ router.post('/board',  function (req,res) {
             }
             else {
                 return res.status(200).json({
-                  // result:result,
+                  result:result,
                   message:'You successfully create a board'
                 });
             }
         })
-    // }
+    }
   })
 
   //delete board
