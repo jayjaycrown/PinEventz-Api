@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const passport = require('passport');
+const _ = require('lodash');
 const jwt = require('jsonwebtoken');
 
 const User = mongoose.model('User');
@@ -61,7 +62,7 @@ module.exports.authenticate = (req, res, next) => {
           return res.status(200).json({
             message: "Authentication Successful",
             token: token,
-            "token": user.generateJwt()
+            "token": token
           })
       }
         // unknown user or wrong password
