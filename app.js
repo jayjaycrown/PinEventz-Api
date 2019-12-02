@@ -22,6 +22,8 @@ app.use(passport.initialize());
 app.use('/api', rtsIndex);
 app.use('/user', userIndex);
 
+// Make Images "Uploads" Folder Publicly Available
+app.use('/public', express.static('uploads'));
 
 // error handler
 app.use((err, req, res, next) => {

@@ -12,7 +12,8 @@ const Event = require('../models/event');
 const Comment = require('../models/comment');
 const user = require('../controllers/user.controller');
 require('../config/passportConfig');
-
+// Multer File upload settings
+const DIR = './uploads/';
 // section to intialize cloudinary
 cloudinary.config({
   cloud_name:process.env.CLOUD_NAME,
@@ -21,11 +22,12 @@ cloudinary.config({
 })
 // section to create board by authenticated user
 const storage = multer.diskStorage({
-  name:function (req,file,cb) {
-     var datetimestamp = Date.now();
-     cb(null, file.fieldname + '-' + Date.now());
-     filepath = datetimestamp + '.' + file.originalname.split('.')[file.originalname.split('.').length -1];
-    cb(null, filepath);
+  destination: (req, file, cb) => {
+    cb(null, DIR);
+  },
+  filename: (req, file, cb) => {
+    const fileName = file.originalname.toLowerCase().split(' ').join('-');
+    cb(null, fileName)
   }
 });
 const fileFilter=(req,file,cb)=> {
@@ -120,7 +122,7 @@ router.post('/board', uploadBoard.single('image'),  function (req,res) {
       console.log(err);
         return res.status(501).json(err);
     } else {
-        req.body.image = result.secure_url;
+        req.body.image = url + '/public/' + req.file.filename;
         const author = {
           username: req.user.username,
           id:req.user._id
