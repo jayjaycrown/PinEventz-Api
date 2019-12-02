@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const passport = require('passport');
-const _ = require('lodash');
-const jwt = require('jasonwebtoken');
+const jwt = require('jsonwebtoken');
 
 const User = mongoose.model('User');
 
