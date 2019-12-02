@@ -64,7 +64,7 @@ module.exports.authenticate = (req, res, next) => {
             token: token,
             "token": token
           })
-      }
+      } 
         // unknown user or wrong password
         else return res.status(404).json(info);
     })(req, res);
