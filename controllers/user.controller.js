@@ -27,11 +27,7 @@ module.exports.register = (req, res, next) => {
     user.save((err, doc) => {
         if (!err){
             res.send(doc);
-            var token;
-            token = user.generateJwt();
-            res.json({
-                token : token
-            });
+           
         }
 
         else {
@@ -64,7 +60,7 @@ module.exports.authenticate = (req, res, next) => {
             token: token,
             "token": token
           })
-      } 
+      }
         // unknown user or wrong password
         else return res.status(404).json(info);
     })(req, res);
