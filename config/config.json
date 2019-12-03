@@ -4,9 +4,7 @@
         "MONGODB_URI": "mongodb://localhost:27017/pineventz",
         "JWT_SECRET": "SECRET#123",
         "JWT_EXP": "1h",
-        "CLOUD_NAME": "pineventz",
-        "API_KEY": "881688721467454",
-        "API_SECRET": "8a9XGBwyA6UbkpWXv8t8I9hACgQ"
+        "CLOUD_NAME": "pineventz"
     },
     "production": {
         "MONGODB_URI": "mongodb+srv://jayjaycrown:jayjaycrown@pineventz-brcsk.mongodb.net/pineventz",

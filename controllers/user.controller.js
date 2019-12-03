@@ -32,13 +32,14 @@ module.exports.register = (req, res, next) => {
 
         else {
             if (err.code == 11000)
-                res.status(422).send(['Duplicate email adrress found.']);
+                res.status(422).send(['Duplicate email adrress or Name found.']);
             else
                 return next(err);
         }
 
     });
 }
+
 
 module.exports.authenticate = (req, res, next) => {
     // call for passport authentication
@@ -51,15 +52,15 @@ module.exports.authenticate = (req, res, next) => {
             email: user.email,
             userId: user._id
           },
-           process.env.JWT_SECRET,
+          process.env.JWT_SECRET,
            {
               expiresIn: process.env.JWT_EXP
            });
-           console.log("Hello " + req.user.username);
           return res.status(200).json({
-            message: "Authentication Successful",
+            message: "Authentication Successful: hello: " + user.email,
+            user: user,
+
             token: token,
-            "token": token,
 
           })
 
@@ -70,17 +71,18 @@ module.exports.authenticate = (req, res, next) => {
 }
 
 module.exports.userProfile = (req, res, next) =>{
+  res.status(200).json({
+    message: "successful",
+    user: res.locals.user
+  });
   var user = req.user;
-
-   (err, user) => {
-    if (!user){
-          return res.status(404).json({ status: false, message: 'User record not found.' })}
-
-    else {
-      var user = req.user;
-      return res.render('profile', { title: 'profile', user: user });
-  }
+  res.render('profile', { title: 'profile', user: user });
 }
+module.exports.logout = (req, res, next) => {
+  req.logout();
+  res.status(200).json({
+      'message': 'successfully logout'
+  });
 }
 
 module.exports.interest =   (req,res, next) => {
@@ -107,3 +109,38 @@ module.exports.interest =   (req,res, next) => {
         }
     })
   }
+
+  module.exports.users = (req, res, next) => {
+
+    User.find()
+    .select()
+    .exec()
+          .then(result => {
+                  return res.status(200).json(result);
+          })
+          .catch(err => {
+              res.status(500).json(err);
+            })
+  }
+
+
+  //get board by id
+module.exports.singleUser = (req, res, next) => {
+  const id = req.params.Id;
+    User.findById(id)
+    .exec()
+    .then(doc=>{
+       if(doc){
+        res.status(200).json(doc);
+       }else{
+        res.status(200).json({
+          message:'Invalid Id Number'
+        });
+       }
+      })
+      .catch(err=>{
+        res.status(500).json({
+            error:err
+         });
+      });
+}

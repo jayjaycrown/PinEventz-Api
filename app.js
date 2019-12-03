@@ -8,29 +8,35 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const passport = require('passport');
 const morgan = require('morgan');
+var cookieParser = require('cookie-parser')
 
 const rtsIndex = require('./routes/index.router');
 const userIndex = require('./routes/user');
 const PORT = process.env.PORT || 5000
 
 var app = express();
-app.use(expressSession({
-    secret: 'cookie_secret',
-      name: 'cookie_name',
-      proxy: true,
-      resave: true,
-      saveUninitialized: true
-  }));
 
 // middleware
 app.use(morgan('dev'));
+app.use(cookieParser());
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(expressSession({
+    secret: 'cookie_secret',
+      name: 'cookie_name',
+      proxy: false,
+      resave: true,
+      expires: 1,
+      saveUninitialized: true
+  }));
+
 app.use(cors());
 app.use(passport.initialize());
+
 app.use(passport.session({
     secret: 'cookie_secret',
     name: 'cookie_name',
-    proxy: true,
+    proxy: false,
     resave: true,
     saveUninitialized: true
 }));
@@ -38,7 +44,7 @@ app.use('/api', rtsIndex);
 app.use('/user', userIndex);
 
 // Make Images "Uploads" Folder Publicly Available
-app.use('/public', express.static('uploads'));
+app.use('/uploads', express.static('uploads'));
 app.use(function(req, res, next){
     res.locals.user = req.user;
     next();

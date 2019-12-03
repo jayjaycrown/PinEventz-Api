@@ -40,8 +40,7 @@ var userSchema = new mongoose.Schema({
         require:true,
     },
     checkbox:{
-        type: String,
-        require: true
+        type: String
     },
     // facebookProvider: {
     //     type: {

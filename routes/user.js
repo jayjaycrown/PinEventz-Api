@@ -1,6 +1,5 @@
 const express=require('express');
 const router=express.Router();
-const multer=require('multer');
 const passport=require('passport');
 const cloudinary = require('cloudinary');
 const dotenv = require('dotenv').config();
@@ -12,50 +11,60 @@ const Event = require('../models/event');
 const Comment = require('../models/comment');
 const user = require('../controllers/user.controller');
 require('../config/passportConfig');
+const jwtHelper = require('../config/jwtHelper');
+const multer=require('multer');
 // Multer File upload settings
 const DIR = './uploads/';
 // section to intialize cloudinary
-cloudinary.config({
-  cloud_name:process.env.CLOUD_NAME,
-  api_key:process.env.API_KEY,
-  api_secret:process.env.API_SECRET
-})
+// cloudinary.config({
+//   cloud_name:process.env.CLOUD_NAME,
+//   api_key:process.env.API_KEY,
+//   api_secret:process.env.API_SECRET
+// })
 // section to create board by authenticated user
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, DIR);
-  },
-  filename: (req, file, cb) => {
-    const fileName = file.originalname.toLowerCase().split(' ').join('-');
-    cb(null, fileName)
+  destination: function (req, file, cb) {
+    cb(null, './uploads/');
+   },
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname +  '-' + Date.now() +  '-' + file.originalname);
+   }
+});
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg"){
+    cb(null, true)
+  } else {
+    return cb(new Error('Only .png, .jpg and .jpeg format allowed!'));
   }
-});
-const fileFilter=(req,file,cb)=> {
-//reject a file
-if (file.mimetype==='image/jpeg' || 'image/png' ) {
-  cb(null,true);
-}else{
-  cb(null,false);
- }
-}
-// Function to create board
-const uploadBoard=multer({
- storage:storage,
- limits:{fileSize :1024*1024*5},
-  fileFilter:fileFilter
-});
-// Function to create event
-const uploadEvent=multer({
-  storage:storage,
-  limits:{fileSize :1024*1024*5},
-   fileFilter:fileFilter
+
+
+};
+const upload  = multer({
+  storage: storage,
+  limits: {
+  fileSize: 1024 * 1024 * 5
+  },
+  fileFilter: fileFilter
  });
+
+// Function to create event
+// const uploadEvent=multer({
+//   storage:storage,
+//   limits:{fileSize :1024*1024*5},
+//    fileFilter:fileFilter
+//  });
 // user section
 router.get('', function(req, res, next) {
     return res.send('User Section to render user action!');
  });
 // Router to create interest by admin
 router.post('/interest',   function (req,res) {
+  const token = req.body.jwt;
+  console.log('token: ' + token);
+  const x = jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
+      if (err) throw err;
+      console.log(decoded);
+  })
     var interest= new Interest({
         interestIcon:req.body.requestIcon,
         interestTitle:req.body.interestTitle,
@@ -66,15 +75,17 @@ router.post('/interest',   function (req,res) {
         if (err) {
           return res.status(501).json()
         }else{
+          const token = req.body.jwt;
+          console.log('token: ' + token);
          return res.status(200).json({
-            message:'Interest has been created Succesfully',
+            message:'Interest has been created Succesfully' + token,
           })
         };
       })
 })
 // section to get interest
 // isValidUser,
-router.get('/interests', function (req,res) {
+router.get('/interests',jwtHelper, function (req,res) {
     Interest.find()
     .select('interestTitle interestDescription interestIcon')
     .exec()
@@ -115,24 +126,26 @@ router.post('/select',    function (req,res) {
 // Function to create board to pin event to
 // uploadBoard.single('image'),
 // Function to create board to pin event to
-router.post('/board', uploadBoard.single('image'),  function (req,res) {
+router.post('/board', upload.single('boardUrl'),  function (req,res) {
+  const url = req.protocol + '://' + req.get('host')
+  console.log(req.file);
+  // const url = req.protocol + '://' + req.get('host')
+  // boardUrl = url + '/uploads/' + req.file.filename;
+        // const author = {
+        //   username: req.user.username,
+        //   id:req.user._id
+        // },
+
   // console.log(req.file);
-  cloudinary.v2.uploader.upload(req.file.path, function (err,result) {
-    if (err) {
-      console.log(err);
-        return res.status(501).json(err);
-    } else {
-        req.body.image = url + '/public/' + req.file.filename;
-        const author = {
-          username: req.user.username,
-          id:req.user._id
-        }
         const board = new Board ({
-            boardUrl:req.body.image,
+            //_id: new mongoose.Types.ObjectId(),
+
+            boardUrl: url + '/' + req.file.path,
             boardName:req.body.boardName,
             boardDescription:req.body.boardDescription,
             boardCategory: req.body.boardCategory,
-            creator:author,
+            boardStatus: req.body.boardStatus,
+            //creator:author,
             created_dt:Date.now(),
         });
         board.save(function (err) {
@@ -140,15 +153,16 @@ router.post('/board', uploadBoard.single('image'),  function (req,res) {
                 return res.status(501).json(err);
             }
             else {
+              //console.log(result);
                 return res.status(200).json({
-                  result:result,
+                 // result:result,
                   message:'You successfully create a board'
                 });
             }
         })
-    }
-  })
 })
+
+
 
   //delete board
 router.delete('/board/:Id', function(req, res) {
@@ -194,7 +208,7 @@ router.get('/board/:Id', function (req,res) {
 
 // })
 // Function to get board
-router.get('/board', function (req,res) {
+router.get('/board', jwtHelper, function (req,res) {
   Board.find()
   .exec()
         .then(result => {
@@ -334,8 +348,11 @@ function eventOwner(req,res,next) {
   }
 }
 // Function to check user authentication
-function isValidUser(req,res,next) {
-    if (req.isAuthenticated()) next();
-    else return res.status(401).json({message:'Unauthorized Request'});
+function isLoggedIn(req, res, next) {
+  if (req.isAuthenticated())
+      return next();
+  res.status(400).json({
+      'message': 'access denied'
+  });
 }
 module.exports=router;
