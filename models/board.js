@@ -1,7 +1,6 @@
 const mongoose=require('mongoose');
-const Schema=mongoose.Schema
 
-const BoardSchema=mongoose.Schema({
+var BoardSchema = new mongoose.Schema({
     boardName:{
     	type:String,
         require:true,
@@ -22,6 +21,7 @@ const BoardSchema=mongoose.Schema({
         type:Date,
     	require:true
     },
+    creator:[{username : String, id: String}],
 
     // Event added to a board start
     events: [
@@ -32,4 +32,5 @@ const BoardSchema=mongoose.Schema({
     ]
     // Event added to a board ends
 });
-module.exports=mongoose.model('Board',BoardSchema);
+
+module.exports = mongoose.model('Board', BoardSchema);

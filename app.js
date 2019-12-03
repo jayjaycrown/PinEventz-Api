@@ -26,20 +26,14 @@ app.use(expressSession({
       name: 'cookie_name',
       proxy: false,
       resave: true,
-      expires: 1,
+      expires: false,
       saveUninitialized: true
   }));
 
 app.use(cors());
 app.use(passport.initialize());
 
-app.use(passport.session({
-    secret: 'cookie_secret',
-    name: 'cookie_name',
-    proxy: false,
-    resave: true,
-    saveUninitialized: true
-}));
+app.use(passport.session());
 app.use('/api', rtsIndex);
 app.use('/user', userIndex);
 
@@ -54,6 +48,7 @@ app.use(function(req, res, next){
     next();
 })
 
+app.use((req, res, next) => {req.user = req.session.user; next()})
 // error handler
 app.use((err, req, res, next) => {
     if (err.name === 'ValidationError') {

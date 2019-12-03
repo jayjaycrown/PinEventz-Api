@@ -15,12 +15,7 @@ const jwtHelper = require('../config/jwtHelper');
 const multer=require('multer');
 // Multer File upload settings
 const DIR = './uploads/';
-// section to intialize cloudinary
-// cloudinary.config({
-//   cloud_name:process.env.CLOUD_NAME,
-//   api_key:process.env.API_KEY,
-//   api_secret:process.env.API_SECRET
-// })
+
 // section to create board by authenticated user
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -126,84 +121,20 @@ router.post('/select',    function (req,res) {
 // Function to create board to pin event to
 // uploadBoard.single('image'),
 // Function to create board to pin event to
-router.post('/board', upload.single('boardUrl'),  function (req,res) {
-  const url = req.protocol + '://' + req.get('host')
-  console.log(req.file);
-  // const url = req.protocol + '://' + req.get('host')
-  // boardUrl = url + '/uploads/' + req.file.filename;
-        // const author = {
-        //   username: req.user.username,
-        //   id:req.user._id
-        // },
+router.post('/board',jwtHelper,   function (req,res) {
 
-  // console.log(req.file);
-        const board = new Board ({
-            //_id: new mongoose.Types.ObjectId(),
-
-            boardUrl: url + '/' + req.file.path,
-            boardName:req.body.boardName,
-            boardDescription:req.body.boardDescription,
-            boardCategory: req.body.boardCategory,
-            boardStatus: req.body.boardStatus,
-            //creator:author,
-            created_dt:Date.now(),
-        });
-        board.save(function (err) {
-          if (err) {
-                return res.status(501).json(err);
-            }
-            else {
-              //console.log(result);
-                return res.status(200).json({
-                 // result:result,
-                  message:'You successfully create a board'
-                });
-            }
-        })
 })
 
 
 
   //delete board
 router.delete('/board/:Id', function(req, res) {
-  const id = req.params.Id;
-    Board.findByIdAndDelete(id)
-    .exec()
-    .then(doc=>{
-       if(doc){
-        res.status(200).json(doc);
-       }else{
-        res.status(200).json({
-          message:'Invalid Id Number'
-        });
-       }
-      })
-      .catch(err=>{
-        res.status(500).json({
-            error:err
-         });
-      });
+
 
 })
 //get board by id
 router.get('/board/:Id', function (req,res) {
-  const id = req.params.Id;
-    Board.findById(id)
-    .exec()
-    .then(doc=>{
-       if(doc){
-        res.status(200).json(doc);
-       }else{
-        res.status(200).json({
-          message:'Invalid Id Number'
-        });
-       }
-      })
-      .catch(err=>{
-        res.status(500).json({
-            error:err
-         });
-      });
+
 })
 
 // })
