@@ -271,7 +271,7 @@ module.exports.getBoardById = (req, res, next) => {
 }
 
 module.exports.createEvent = (req, res, next) => {
-  const url = req.protocol + '://' + req.get('host')
+  const url = 'https://' + req.get('host')
   user: req.userData;
   const author = {
     username: req.userData.fullName,
