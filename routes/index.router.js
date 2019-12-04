@@ -53,7 +53,7 @@ router.get('/board',jwtHelper, ctrlUser.getBoard);
 router.post('/board', jwtHelper,upload.single('boardUrl'), ctrlUser.createBoard);
 router.delete('/board/:Id', jwtHelper, ctrlUser.deleteBoard);
 router.get('/board/:Id', jwtHelper, ctrlUser.getBoardById);
-router.get('/myboard', jwtHelper, ctrlUser.getMyBoard);
+//router.get('/myboard', jwtHelper, ctrlUser.getMyBoard);
 
 // Event Section
 router.post('/event', jwtHelper,upload.single('eventUrl'), ctrlUser.createEvent);

@@ -217,17 +217,17 @@ console.log(req.file);
       }
   })
 }
-module.exports.getMyBoard = (req, res, next) => {
-  var id = req.userData.userId;
-  board.find('creator')
-  .where('creator[0].authorId', id)
-  .exec()
-    .then(result  => {
-      return res.status(200).json(result);
-    }).catch(err => {
-      res.status(500).json(err);
-    });
-}
+// module.exports.getMyBoard = (req, res, next) => {
+//   var id = req.userData.userId;
+//   board.find('creator')
+//   .where('creator[0].authorId', id)
+//   .exec()
+//     .then(result  => {
+//       return res.status(200).json(result);
+//     }).catch(err => {
+//       res.status(500).json(err);
+//     });
+// }
 
 module.exports.getBoard = (req, res, next) => {
   //var id = req.userData.userId;
@@ -236,14 +236,14 @@ module.exports.getBoard = (req, res, next) => {
   //.select('creator.authorId')
   //.where({'creator.authorId': req.userData.userId})
   .exec()
-        .then(result => {
+    .then(result => {
 
-               return res.status(200).json(result);
+            return res.status(200).json(result);
 
-        })
-        .catch(err => {
-            res.status(500).json(err);
-        })
+    })
+    .catch(err => {
+        res.status(500).json(err);
+    })
 }
 module.exports.deleteBoard = (req, res, next) => {
   const id = req.params.Id;
