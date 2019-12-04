@@ -8,6 +8,7 @@ const Board = require('../models/board');
 const Event = require('../models/event');
 //const comment = mongoose.model('Comment')
 
+
 const multer=require('multer');
 // Multer File upload settings
 const DIR = './uploads/';
@@ -94,6 +95,7 @@ module.exports.authenticate = (req, res, next) => {
             message: "Authentication Successful: hello: " + user.email,
             user: user,
             token: token,
+            expiresIn: process.env.JWT_EXP
 
           })
 
