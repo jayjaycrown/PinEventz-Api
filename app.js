@@ -9,10 +9,20 @@ const cors = require('cors');
 const passport = require('passport');
 const morgan = require('morgan');
 var cookieParser = require('cookie-parser')
+var http = require('http');
+var https = require('https');
+var fs = require('fs');
 
 const rtsIndex = require('./routes/index.router');
 const userIndex = require('./routes/user');
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 5000;
+
+var key = fs.readFileSync(__dirname + '/selfsigned.key');
+var cert = fs.readFileSync(__dirname + '/selfsigned.crt');
+var options = {
+  key: key,
+  cert: cert
+};
 
 var app = express();
 
@@ -59,5 +69,7 @@ app.use((err, req, res, next) => {
 
 });
 
+var server = https.createServer(options, app);
+
 // start server
-app.listen(PORT, () => console.log(`Server started at port : ${PORT}`));
+server.listen(PORT, () => console.log(`Server started at port : ${PORT}`));
