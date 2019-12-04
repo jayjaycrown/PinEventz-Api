@@ -21,7 +21,7 @@ var BoardSchema = new mongoose.Schema({
         type:Date,
     	require:true
     },
-    creator:[{username : String, id: String}],
+    creator:[{username : String, authorId: String}],
 
     // Event added to a board start
     events: [

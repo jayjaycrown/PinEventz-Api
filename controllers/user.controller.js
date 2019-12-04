@@ -200,7 +200,7 @@ console.log(req.file);
       boardStatus: req.body.boardStatus,
       creator:{
           username: req.userData.fullName,
-          id:req.userData.userId
+          authorId:req.userData.userId
         },
       created_dt:Date.now(),
   });
@@ -219,7 +219,8 @@ console.log(req.file);
 }
 module.exports.getMyBoard = (req, res, next) => {
   var id = req.userData.userId;
-  board.find({'author.id': id})
+  board.find('creator')
+  .where('creator[0].authorId', id)
   .exec()
     .then(result  => {
       return res.status(200).json(result);
@@ -229,10 +230,16 @@ module.exports.getMyBoard = (req, res, next) => {
 }
 
 module.exports.getBoard = (req, res, next) => {
-  Board.find()
+  //var id = req.userData.userId;
+  //const creator = creator[0].authorId;
+  Board.find({'creator.authorId': req.userData.userId})
+  //.select('creator.authorId')
+  //.where({'creator.authorId': req.userData.userId})
   .exec()
         .then(result => {
+
                return res.status(200).json(result);
+
         })
         .catch(err => {
             res.status(500).json(err);
@@ -262,10 +269,14 @@ module.exports.deleteBoard = (req, res, next) => {
 
 module.exports.getBoardById = (req, res, next) => {
   const id = req.params.Id;
+  const userId = req.userData.userId;
     Board.findById(id)
     .exec()
     .then(doc=>{
+      console.log('user id:' + userId)
+      console.log('id in author:' +doc.creator[0].authorId);
        if(doc){
+        //console.log(doc);
         res.status(200).json(doc);
        }else{
         res.status(200).json({
