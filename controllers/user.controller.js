@@ -217,6 +217,16 @@ console.log(req.file);
       }
   })
 }
+module.exports.getMyBoard = (req, res, next) => {
+  var id = req.userData.userId;
+  board.find({'author.id': id})
+  .exec()
+    .then(result  => {
+      return res.status(200).json(result);
+    }).catch(err => {
+      res.status(500).json(err);
+    });
+}
 
 module.exports.getBoard = (req, res, next) => {
   Board.find()
