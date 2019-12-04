@@ -28,13 +28,19 @@ var EventSchema=mongoose.Schema({
     finishDate:{
         type:String
      },
-     organizer:{
-         id:{
-             type:mongoose.Schema.Types.ObjectId,
-             ref:"User"
-         },
-         username: String
+     board:{
+        type:String
      },
+     status:{
+        type:String
+     },
+     category:{
+        type:String
+     },
+     time:{
+        type:String
+     },
+     organizer:[{username : String, id: String}],
      comments: [
           {
               type: mongoose.Schema.ObjectId,

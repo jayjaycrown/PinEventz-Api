@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user.model')
 //const User = mongoose.model('User');
 const Board = require('../models/board');
+const Event = require('../models/event');
 //const comment = mongoose.model('Comment')
 
 const multer=require('multer');
@@ -205,11 +206,9 @@ console.log(req.file);
   });
   board.save(function (err) {
     if (err) {
-      console.log(author);
-          return res.status(501).json(err);console.log(author);
+          return res.status(501).json(err);
       }
       else {
-        console.log(author);
         //console.log(result);
           return res.status(200).json({
            // result:result,
@@ -269,4 +268,97 @@ module.exports.getBoardById = (req, res, next) => {
             error:err
          });
       });
+}
+
+module.exports.createEvent = (req, res, next) => {
+  const url = req.protocol + '://' + req.get('host')
+  user: req.userData;
+  const author = {
+    username: req.userData.fullName,
+    id:req.userData.userId
+  }
+  console.log(author);
+  console.log(req.file);
+  const event = new Event ({
+      eventName:req.body.eventName,
+      address:req.body.address,
+      shortDes:req.body.shortDes,
+      fullDes:req.body.fullDes,
+      eventUrl:url + '/' + req.file.path,
+      startDate:req.body.startDate,
+      finishDate:req.body.finishDate,
+      board:req.body.board,
+      status:req.body.status,
+      category: req.body.category,
+      time:req.body.time,
+      organizer:{
+        username: req.userData.fullName,
+        id:req.userData.userId
+      },
+      created_dt:Date.now(),
+  });
+  event.save(function (err) {
+      if (err) {
+          return res.status(501).json(err);
+      } else {
+          return res.status(200).json({
+            //result:result,
+            message:'You successfully create an event'
+          });
+      }
+  })
+}
+
+
+module.exports.getEvents = (req, res, next) => {
+  Event.find()
+  .exec()
+    .then(result => {
+            return res.status(200).json(result);
+    })
+    .catch(err => {
+        res.status(500).json(err);
+    })
+}
+
+module.exports.getEventsById = (req, res, next) => {
+  const id = req.params.Id;
+    Event.findById(id)
+    .exec()
+    .then(doc=>{
+       if(doc){
+        res.status(200).json(doc);
+       }else{
+        res.status(200).json({
+          message:'Event not Found'
+        });
+       }
+      })
+      .catch(err=>{
+        res.status(500).json({
+            error:err
+         });
+      });
+}
+
+module.exports.deleteEvents = (req, res, next) => {
+  const id = req.params.Id;
+  Event.findByIdAndDelete(id)
+  .exec()
+  .then(doc=>{
+     if(doc){
+      res.status(200).json(
+       { message: "Board Deleted"}
+      );
+     }else{
+      res.status(200).json({
+        message:'Invalid Id Number'
+      });
+     }
+    })
+    .catch(err=>{
+      res.status(500).json({
+          error:err
+       });
+    });
 }

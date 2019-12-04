@@ -121,9 +121,7 @@ router.post('/select',    function (req,res) {
 // Function to create board to pin event to
 // uploadBoard.single('image'),
 // Function to create board to pin event to
-router.post('/board',jwtHelper,   function (req,res) {
 
-})
 
 
 
@@ -153,50 +151,9 @@ router.get('/board', jwtHelper, function (req,res) {
 
 // Function to create event
 // isValidUser,
-router.post('/event',  function (req,res) {
 
-
-        // const organizer = {
-        //   id : req.user._id,
-        //   username : req.user.username
-        // }
-        req.body.image = result.secure_url;
-        const event = new Event ({
-           // organizer:organizer,
-            eventUrl:req.body.eventUrl,
-            eventName:req.body.eventName,
-            address:req.body.address,
-            shortDes:req.body.shortDes,
-            fullDes:req.body.fullDes,
-            startDate:req.body.startDate,
-            finishDate:req.body.finishDate,
-            created_dt:Date.now(),
-        });
-        event.save(function (err) {
-            if (err) {
-                return res.status(501).json(err);
-            } else {
-                return res.status(200).json({
-                  //result:result,
-                  message:'You successfully create an event'
-                });
-            }
-        })
-
-
-})
 // Function to get all event
-router.get('/event', function (req,res) {
-  Event.find()
-  .select('finishDate startDate fullDes shortDes address eventName eventUrl organizer.username organizer._id')
-  .exec()
-        .then(result => {
-               return res.status(200).json(result);
-        })
-        .catch(err => {
-            res.status(500).json(err);
-        })
-})
+
 // Function to get event by id
 router.get('/event/:Id', function (req,res) {
   const id = req.params.Id;

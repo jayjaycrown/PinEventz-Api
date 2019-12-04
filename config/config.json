@@ -3,7 +3,7 @@
         "PORT": 3000,
         "MONGODB_URI": "mongodb://localhost:27017/pineventz",
         "JWT_SECRET": "SECRET#123",
-        "JWT_EXP": "1h",
+        "JWT_EXP": "10h",
         "CLOUD_NAME": "pineventz"
     },
     "production": {
