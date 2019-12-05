@@ -204,7 +204,10 @@ console.log(req.file);
   });
   board.save(function (err) {
     if (err) {
-          return res.status(501).json(err);
+          return res.status(501).json({
+            message: 'theres an error' + err
+          });
+
       }
       else {
         //console.log(result);
