@@ -181,8 +181,8 @@ module.exports.singleUser = (req, res, next) => {
 
 module.exports.createBoard = (req, res, next) => {
   user: req.userData;
-//const url = req.protocol + '://' + req.get('host')
-  const url = 'https://' + req.get('host')
+const url = req.protocol + '://' + req.get('host')
+  //const url = 'https://' + req.get('host')
 console.log(req.file);
 // const url = req.protocol + '://' + req.get('host')
 // boardUrl = url + '/uploads/' + req.file.filename;
