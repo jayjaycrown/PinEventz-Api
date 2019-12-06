@@ -118,36 +118,26 @@ router.post('/select',    function (req,res) {
       }
   })
 })
-// Function to create board to pin event to
-// uploadBoard.single('image'),
-// Function to create board to pin event to
 
 
 
 
-  //delete board
-router.delete('/board/:Id', function(req, res) {
 
 
-})
-//get board by id
-router.get('/board/:Id', function (req,res) {
-
-})
 
 // })
 // Function to get board
-router.get('/board', jwtHelper, function (req,res) {
-  Board.find()
-  .exec()
-        .then(result => {
-               return res.status(200).json(result);
-        })
-        .catch(err => {
-            res.status(500).json(err);
-        })
+// router.get('/board', jwtHelper, function (req,res) {
+//   Board.find()
+//   .exec()
+//         .then(result => {
+//                return res.status(200).json(result);
+//         })
+//         .catch(err => {
+//             res.status(500).json(err);
+//         })
 
-})
+// })
 
 // Function to create event
 // isValidUser,
@@ -176,31 +166,8 @@ router.get('/event/:Id', function (req,res) {
          });
       });
 })
-// Function to add comment to event
-router.post('/event/:Id/comment', function (req,res) {
-  Event.findById(req.params.Id, function (err,event) {
-        if (err) {
-          res.status(501).json(err);
-        } else {
-          Comment.create( {text:req.body.text},  function (err, comment) {
-            if (err) {
-               res.status(501).json(err);
-            } else {
-              // section to add the user detail
-              //  comment.author.id = req.user._id;
-              //  comment.author.username = req.user.username;
-              comment.save();
-              event.comments.push(comment);
-              event.save()
-              return res.status(200).json({
-                result:event,
-                message:'You have successfully comment on an event'
-              });
-            }
-          })
-        }
-  } )
-})
+
+
 // Function to pin event to board
 router.post('/pin/:Id/event', function (req,res) {
     Board.findById(req.params.Id)

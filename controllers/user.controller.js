@@ -6,7 +6,7 @@ const User = require('../models/user.model')
 //const User = mongoose.model('User');
 const Board = require('../models/board');
 const Event = require('../models/event');
-//const comment = mongoose.model('Comment')
+const Comment = require('../models/comment')
 
 
 const multer=require('multer');
@@ -293,7 +293,7 @@ module.exports.getBoardById = (req, res, next) => {
 }
 
 module.exports.createEvent = (req, res, next) => {
-  const url = 'https://' + req.get('host')
+  const url = req.protocol + '://' + req.get('host')
   user: req.userData;
   const author = {
     username: req.userData.fullName,
@@ -346,6 +346,7 @@ module.exports.getEvents = (req, res, next) => {
 module.exports.getEventsById = (req, res, next) => {
   const id = req.params.Id;
     Event.findById(id)
+    .populate("comments")
     .exec()
     .then(doc=>{
        if(doc){
@@ -371,6 +372,76 @@ module.exports.deleteEvents = (req, res, next) => {
      if(doc){
       res.status(200).json(
        { message: "Board Deleted"}
+      );
+     }else{
+      res.status(200).json({
+        message:'Invalid Id Number'
+      });
+     }
+    })
+    .catch(err=>{
+      res.status(500).json({
+          error:err
+       });
+    });
+}
+
+module.exports.pinEvent = (req, res, next) => {
+  Board.findById(req.params.Id)
+  if (err) {
+    res.status(501).json(err);
+  } else {
+    event.create(function (err) {
+      if (err) {
+          return res.status(501).json(err);
+      } else {
+          return res.status(200).json({
+            //result:result,
+            message:'You successfully create an event'
+          });
+      }
+  })
+  board.event.push(event);
+  }
+}
+
+module.exports.addComment =(req, res, next) => {
+  Event.findById(req.params.Id, function (err,event) {
+    if (err) {
+      res.status(501).json(err);
+    } else {
+      Comment.create(
+        {
+          text:req.body.text,
+          authorName: req.userData.fullName,
+          authorId:req.userData.userId,
+          created_dt:Date.now(),
+        },  function (err, comment) {
+        if (err) {
+           res.status(501).json(err);
+        } else {
+          comment.save();
+          event.comments.push(comment);
+          event.save()
+          return res.status(200).json({
+            result:event,
+            message:'You have successfully comment on an event'
+          });
+        }
+      })
+    }
+} )
+}
+
+module.exports.deleteComment = (req, res, next) => {
+  const id = req.params.Id;
+  Event.find('comments')
+  comment.findByIdAndDelete(id)
+  .exec()
+  .then(doc=>{
+     if(doc){
+      res.status(200).json(
+       { message: "Comment Deleted"}
       );
      }else{
       res.status(200).json({

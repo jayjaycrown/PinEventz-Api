@@ -58,10 +58,26 @@ router.get('/board/:Id', jwtHelper, ctrlUser.getBoardById);
 // Event Section
 router.post('/event', jwtHelper,upload.single('eventUrl'), ctrlUser.createEvent);
 router.get('/event',jwtHelper, ctrlUser.getEvents);
-router.delete('/event/:Id', jwtHelper, ctrlUser.deleteEvents);
+router.delete('/event/:Id', eventOwner, jwtHelper, ctrlUser.deleteEvents);
 router.get('/event/:Id', jwtHelper, ctrlUser.getEventsById);
+router.post('/event/:Id/comment', jwtHelper, ctrlUser.addComment);
+router.delete('/event/:Id/comment/:id', jwtHelper, ctrlUser.deleteComment);
 
-
+function eventOwner(req,res,next) {
+  if (req.isAuthenticated()) {
+       Event.findById(req.params.id, function (err,result) {
+         if (err) {
+           return res.status(501).json(err);
+         } else {
+           if (result.organizer.id.equals(req.userData.userId)) {
+           next();
+           } else {
+             console.log('Permission not granted');
+           }
+         }
+       })
+  }
+}
 
 function isLoggedIn(req, res, next) {
   if (req.isAuthenticated())
