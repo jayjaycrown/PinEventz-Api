@@ -324,11 +324,13 @@ module.exports.createEvent = (req, res, next) => {
           return res.status(501).json(err);
       } else {
           return res.status(200).json({
-            //result:result,
+            result:result,
+            board: result.board,
             message:'You successfully create an event'
           });
       }
   })
+
 }
 
 
@@ -387,22 +389,24 @@ module.exports.deleteEvents = (req, res, next) => {
 }
 
 module.exports.pinEvent = (req, res, next) => {
-  Board.findById(req.params.Id)
-  if (err) {
-    res.status(501).json(err);
-  } else {
-    event.create(function (err) {
-      if (err) {
-          return res.status(501).json(err);
-      } else {
-          return res.status(200).json({
-            //result:result,
-            message:'You successfully create an event'
-          });
-      }
+  Board.findById(req.params.Id, function (err, board) {
+    if (err) {
+      res.status(501).json(err);
+    } else {
+      event.create(function (err) {
+        if (err) {
+            return res.status(501).json(err);
+        } else {
+            return res.status(200).json({
+              //result:result,
+              message:'You successfully create an event'
+            });
+        }
+    })
+    board.event.push(event);
+    }
   })
-  board.event.push(event);
-  }
+
 }
 
 module.exports.addComment =(req, res, next) => {
