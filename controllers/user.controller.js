@@ -174,6 +174,9 @@ module.exports.resetPassword = (req, res, next) => {
     .status(409)
     .json({ message: 'Email does not exist' });
     }
+    return res.status(200).json({
+      user: user})
+    console.log("user found id is" + user._id);
     var resettoken = new passwordResetToken({ _userId: user._id, resettoken: crypto.randomBytes(16).toString('hex') });
     resettoken.save(function (err) {
     if (err) { return res.status(500).send({ msg:err.message }); }
