@@ -7,6 +7,7 @@ const User = require('../models/user.model')
 const Board = require('../models/board');
 const Event = require('../models/event');
 const Comment = require('../models/comment');
+const Pinned = require('../models/pinnedEvent')
 const nodemailer = require('nodemailer');
 const hbs = require('nodemailer-express-handlebars');
 const crypto = require('crypto');
@@ -591,21 +592,43 @@ module.exports.deleteEvents = (req, res, next) => {
 }
 
 module.exports.pinEvent = (req, res, next) => {
-  Board.findById(req.params.Id, function (err, board) {
+  Event.findById(req.params.Id, function (err, board) {
     if (err) {
       res.status(501).json(err);
     } else {
-      event.create(function (err) {
-        if (err) {
-            return res.status(501).json(err);
-        } else {
+      if (err) {
+        res.status(501).json(err);
+      } else {
+        Pinned.create(
+          {
+            pin:req.body.pin,
+            user_id:req.userData.userId,
+            created_dt:Date.now(),
+          },  function (err, pinned) {
+          if (err) {
+             res.status(501).json(err);
+          } else {
+            pinned.save();
+            board.events.push(pinned);
+            board.save()
             return res.status(200).json({
-              //result:result,
-              message:'You successfully create an event'
+              result:event,
+              message:'You have successfully push event to board'
             });
-        }
-    })
-    board.event.push(event);
+          }
+        })
+      }
+    //   event.create(function (err) {
+    //     if (err) {
+    //         return res.status(501).json(err);
+    //     } else {
+    //         return res.status(200).json({
+    //           result:result,
+    //           message:'You successfully create an event'
+    //         });
+    //     }
+    // })
+    // board.event.push(event);
     }
   })
 
