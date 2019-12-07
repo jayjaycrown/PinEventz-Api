@@ -146,13 +146,15 @@ module.exports.editProfile = (req, res, next) => {
         message:'User not found'
       });
     }
-    const url = req.protocol + '://' + req.get('host');
+    bcrypt.hash(req.body.password, 10, (err, hash) => {
+      const url = req.protocol + '://' + req.get('host');
     var email = req.body.email.trim();
     var fullName = req.body.fullName.trim();
     var cityCountry = req.body.cityCountry.trim();
     var gender = req.body.gender.trim();
     var dateOfBirth= req.body.dateOfBirth.trim();
     var profileUrl = url + '/' + req.file.path;
+    var password = hash;
     user.email = email;
     user.fullName = fullName;
     user.cityCountry = cityCountry;
@@ -161,11 +163,18 @@ module.exports.editProfile = (req, res, next) => {
     user.dateOfBirth = dateOfBirth;
     user.profileUrl = profileUrl;
     user.save(function (err) {
+      if(err) {
+        res.status(500).json({
+          message:'error occured: ' + err
+        });
+      }
         res.status(200).json({
           message:'Edited Successfully'
         });
     });
-})
+    })
+    })
+
 }
 
 module.exports.resetPassword = (req, res, next) => {
