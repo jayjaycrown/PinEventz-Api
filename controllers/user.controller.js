@@ -10,6 +10,7 @@ const Comment = require('../models/comment');
 const Pinned = require('../models/pinnedEvent')
 const nodemailer = require('nodemailer');
 const hbs = require('nodemailer-express-handlebars');
+const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const passwordResetToken = require('../models/resettoken');
 var sgTransport = require('nodemailer-sendgrid-transport');
@@ -46,36 +47,49 @@ const upload  = multer({
  });
 
 module.exports.register = (req, res, next) => {
-    var user= new User({
-        fullName:req.body.fullName,
-        email:req.body.email,
-        password:req.body.password,
-        cityCountry:req.body.cityCountry,
-        //dateOfBirth:req.body.dateOfBirth,
-        gender:req.body.gender,
-        //checkbox:req.body.checkbox,
-        created_dt:Date.now()
-        // facebookProvider: {
-        //   type: {
-        //         id: String,
-        //         token: String
-        //   },
-        //   select: false
-        //   },
+  User.findOne({email:req.body.email})
+  .exec()
+  .then(user => {
+    if(user) {
+      return res.status(409).json({
+        message: "Mail already exist"
+      })
+    }
+    else {
+      bcrypt.hash(req.body.password, 10, (err, hash) => {
+        if(err) {
+          return res.status(400)
+          .json({ message: 'Error hashing password' });
+        }
+        var user= new User({
+          fullName:req.body.fullName,
+          email:req.body.email,
+          password:hash,
+          cityCountry:req.body.cityCountry,
+          //dateOfBirth:req.body.dateOfBirth,
+          gender:req.body.gender,
+          //checkbox:req.body.checkbox,
+          created_dt:Date.now()
+        });
+        user.save((err, doc) => {
+          if (!err){
+              res.send(doc);
+          }
+
+          // else {
+          //     if (err.code == 11000)
+          //         res.status(422).send(['Duplicate email adrress or Name found.']);
+          //     else
+          //         return next(err);
+          // }
+
       });
-    user.save((err, doc) => {
-        if (!err){
-            res.send(doc);
-        }
+      })
+    }
+  })
 
-        else {
-            if (err.code == 11000)
-                res.status(422).send(['Duplicate email adrress or Name found.']);
-            else
-                return next(err);
-        }
 
-    });
+
 }
 
 
@@ -174,15 +188,14 @@ module.exports.resetPassword = (req, res, next) => {
     res.status(200).json({ message: 'Reset Password link sent successfully.' });
     var transporter = nodemailer.createTransport({
       service: 'Gmail',
-      port: 465,
       auth: {
-        user: 'jayjaycrown@gmail.com',
-        pass: 'olajide5126'
+        user: 'pineventzltd@gmail.com',
+        pass: 'PinEventz2019'
       }
     });
     var mailOptions = {
     to: user.email,
-    from: 'jayjaycrown@gmail.com',
+    from: 'pineventzltd@gmail.com',
     subject: 'PinEventz Password Reset',
     text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
     'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
@@ -190,7 +203,11 @@ module.exports.resetPassword = (req, res, next) => {
     'If you did not request this, please ignore this email and your password will remain unchanged.\n'
     }
     transporter.sendMail(mailOptions, (err, info) => {
-    })
+      if(err)
+     console.log(err)
+   else
+     console.log(info);
+      })
     })
     })
 
@@ -203,19 +220,20 @@ module.exports.ValidPasswordToken = (req, res, next) => {
     .status(500)
     .json({ message: 'Token is required' });
     }
-    const user = passwordResetToken.findOne({
-    resettoken: req.body.resettoken
+   passwordResetToken.findOne({resettoken: req.body.resettoken},{useFindAndModify: false}, function (err, user){
+      if (!user) {
+        return res
+        .status(409)
+        .json({ message: 'Invalid URL' });
+        }
+        User.findById({ _id: user._userId }).then(() => {
+          res.status(200).json({ message: 'Token verified successfully.' });
+          }).catch((err) => {
+          return res.status(500).json({ message: err.message });
+          });
     });
-    if (!user) {
-    return res
-    .status(409)
-    .json({ message: 'Invalid URL' });
-    }
-    User.findOneAndUpdate({ _id: user._userId }).then(() => {
-    res.status(200).json({ message: 'Token verified successfully.' });
-    }).catch((err) => {
-    return res.status(500).send({ msg: err.message });
-    });
+
+
 }
 
 module.exports.NewPassword = (req, res, next) => {
@@ -234,6 +252,7 @@ module.exports.NewPassword = (req, res, next) => {
           .status(409)
           .json({ message: 'User does not exist' });
       }
+
       return bcrypt.hash(req.body.newPassword, 10, (err, hash) => {
         if (err) {
           return res
@@ -255,7 +274,7 @@ module.exports.NewPassword = (req, res, next) => {
 
         });
       });
-    });
+  });
 
   })
 }

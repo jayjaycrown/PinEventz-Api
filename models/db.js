@@ -11,7 +11,7 @@ require('./user.model');
 const URL = process.env.MONGODB_URI;
 // Database connection
 // Database connection setup
-mongoose.connect(URL, { useNewUrlParser: true, useCreateIndex: true })
+mongoose.connect(URL, {  useFindAndModify: false, useNewUrlParser: true, useCreateIndex: true })
 .then(() => console.log("MongoDB successfully connected")).catch((err) => {
   console.log(err)
 });
