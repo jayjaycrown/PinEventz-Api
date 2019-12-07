@@ -11,8 +11,9 @@
         "JWT_SECRET": "SECRET#123",
         "JWT_EXP": "5h",
         "CLOUD_NAME": "pineventz",
-        "SENDGRID_API_PASSWORD": "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",
-        "SENDGRID_API_USER":"resetpassword",
+        "SENDGRID_API_KEY": "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",
+        "SENDGRID_API_PASSWORD": "olajide5126",
+        "SENDGRID_API_USER":"jayjaycrown",
         "API_KEY": "881688721467454",
         "API_SECRET": "8a9XGBwyA6UbkpWXv8t8I9hACgQ"
     }

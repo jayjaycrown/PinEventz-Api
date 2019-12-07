@@ -160,33 +160,29 @@ module.exports.resetPassword = (req, res, next) => {
     .status(500)
     .json({ message: 'Email is required' });
     }
-    const user = User.findOne({
-    email:req.body.email
-    });
-    if (!user) {
-    return res
-    .status(409)
-    .json({ message: 'Email does not exist' });
-    }
-    return res.status(200).json({
-      user: user})
-    console.log("user found id is" + user._id);
+    User.findOne({ email:req.body.email},  function (err, user){
+      if (!user) {
+        return res
+        .status(409)
+        .json({ message: 'Email does not exist' });
+        }
+        console.log("user found id is" + user._id);
     var resettoken = new passwordResetToken({ _userId: user._id, resettoken: crypto.randomBytes(16).toString('hex') });
     resettoken.save(function (err) {
     if (err) { return res.status(500).send({ msg:err.message }); }
     passwordResetToken.find({ _userId: user._id, resettoken: { $ne: resettoken.resettoken } }).remove().exec();
-    res.status(200).json({ message: 'Reset Password successfully.' });
-    var transporter = nodemailer.createTransport(
-      sgTransport({
-        auth: {
-          api_user: process.env.SENDGRID_API_USER,
-          api_key: process.env.SENDGRID_API_PASSWORD
-        },
-      })
-    );
+    res.status(200).json({ message: 'Reset Password link sent successfully.' });
+    var transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      port: 465,
+      auth: {
+        user: 'jayjaycrown@gmail.com',
+        pass: 'olajide5126'
+      }
+    });
     var mailOptions = {
     to: user.email,
-    from: 'your email',
+    from: 'jayjaycrown@gmail.com',
     subject: 'PinEventz Password Reset',
     text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
     'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
@@ -196,6 +192,9 @@ module.exports.resetPassword = (req, res, next) => {
     transporter.sendMail(mailOptions, (err, info) => {
     })
     })
+    })
+
+
 }
 
 module.exports.ValidPasswordToken = (req, res, next) => {
