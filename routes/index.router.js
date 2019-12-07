@@ -47,7 +47,7 @@ router.get('/logout',isLoggedIn, function(req, res, next) {
 
 // User Section
 router.get('/profile' ,jwtHelper, ctrlUser.userProfile);
-router.post('/editprofile', jwtHelper,upload.single('profileUrl'), ctrlUser.editProfile);
+router.put('/editprofile', jwtHelper,upload.single('profileUrl'), ctrlUser.editProfile);
 router.post('/interest',  ctrlUser.interest);
 router.get("/user",jwtHelper, ctrlUser.users);
 router.get('/user/:Id', jwtHelper, ctrlUser.singleUser);

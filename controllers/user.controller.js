@@ -11,6 +11,7 @@ const nodemailer = require('nodemailer');
 const hbs = require('nodemailer-express-handlebars');
 const crypto = require('crypto');
 const passwordResetToken = require('../models/resettoken');
+var sgTransport = require('nodemailer-sendgrid-transport');
 
 
 const multer=require('multer');
@@ -64,7 +65,6 @@ module.exports.register = (req, res, next) => {
     user.save((err, doc) => {
         if (!err){
             res.send(doc);
-
         }
 
         else {
@@ -129,33 +129,30 @@ module.exports.editProfile = (req, res, next) => {
 
     if (!user) {
       return res.status(200).json({
-              message:'User not found'
-            });
+        message:'User not found'
+      });
     }
     const url = req.protocol + '://' + req.get('host')
 
-    var email = req.body.email.trim();
-    var fullName = req.body.fullName.trim();
-    var cityCountry = req.body.cityCountry.trim();
-    var gender = req.body.gender.trim();
-    var dateOfBirth= req.body.dateOfBirth.trim();
-    var profileUrl = url + '/' + req.file.path;
+    const email = req.body.email.trim();
+    const fullName = req.body.fullName.trim();
+    const cityCountry = req.body.cityCountry.trim();
+    const gender = req.body.gender.trim();
+    const dateOfBirth= req.body.dateOfBirth.trim();
+    const password = req.body.password;
+    const profileUrl = url + '/' + req.file.path;
 
     user.email = email;
     user.fullName = fullName;
     user.cityCountry = cityCountry;
     user.gender = gender;
+    user.password = password;
     user.dateOfBirth = dateOfBirth;
     user.profileUrl = profileUrl;
-
-    // don't forget to save!
     user.save(function (err) {
-
-        // todo: don't forget to handle err
-
         res.status(200).json({
-                message:'Edited Successfully'
-              });
+          message:'Edited Successfully'
+        });
     });
 });
 
@@ -178,17 +175,17 @@ module.exports.resetPassword = (req, res, next) => {
     }
     var resettoken = new passwordResetToken({ _userId: user._id, resettoken: crypto.randomBytes(16).toString('hex') });
     resettoken.save(function (err) {
-    if (err) { return res.status(500).send({ msg: err.message }); }
+    if (err) { return res.status(500).send({ msg:err.message }); }
     passwordResetToken.find({ _userId: user._id, resettoken: { $ne: resettoken.resettoken } }).remove().exec();
     res.status(200).json({ message: 'Reset Password successfully.' });
-    var transporter = nodemailer.createTransport({
-      service: 'Gmail',
-      port: 465,
-      auth: {
-        user: 'user',
-        pass: 'password'
-      }
-    });
+    var transporter = nodemailer.createTransport(
+      sgTransport({
+        auth: {
+          api_user: process.env.SENDGRID_API_USER,
+          api_key: process.env.SENDGRID_API_PASSWORD
+        },
+      })
+    );
     var mailOptions = {
     to: user.email,
     from: 'your email',
