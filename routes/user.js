@@ -3,6 +3,7 @@ const router=express.Router();
 const passport=require('passport');
 const cloudinary = require('cloudinary');
 const dotenv = require('dotenv').config();
+const jwt = require('jsonwebtoken');
 const User=require('../models/user.model');
 const Interest=require('../models/interest');
 const My_Interest=require('../models/my_interest');
@@ -120,7 +121,37 @@ router.post('/select',    function (req,res) {
 })
 
 
+router.put('/updateUser', jwtHelper,upload.single('profileUrl'), async (req, res) => {
+  const url = req.protocol + '://' + req.get('host')
 
+  const email = req.body.email;
+  const fullName = req.body.fullName;
+  const cityCountry = req.body.cityCountry;
+  const gender = req.body.gender;
+  const dateOfBirth= req.body.dateOfBirth;
+  const profileUrl = url + '/' + req.file.path;
+  const id = req.userData.userId
+
+  try {
+      await User.update({
+        email : email,
+       fullName : fullName,
+        cityCountry : cityCountry,
+        gender : gender,
+        dateOfBirth : dateOfBirth,
+        profileUrl : profileUrl
+      }, {
+              where: {
+                  id: id
+              }
+          })
+      return res.send({ message: 'User created' });
+  }
+  catch (ex) {
+      console.error(ex);
+      res.status(400);
+      return res.send({ error: ex });
+  }});
 
 
 
