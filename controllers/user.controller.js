@@ -127,22 +127,18 @@ module.exports.userProfile = (req, res, next) =>{
 module.exports.editProfile = (req, res, next) => {
 
   User.findById(req.userData.userId, function (err, user) {
-
     if (!user) {
       return res.status(200).json({
         message:'User not found'
       });
     }
-    const url = req.protocol + '://' + req.get('host')
-
-    const email = req.body.email.trim();
-    const fullName = req.body.fullName.trim();
-    const cityCountry = req.body.cityCountry.trim();
-    const gender = req.body.gender.trim();
-    const dateOfBirth= req.body.dateOfBirth.trim();
-    const password = req.body.password;
-    const profileUrl = url + '/' + req.file.path;
-
+    const url = req.protocol + '://' + req.get('host');
+    var email = req.body.email.trim();
+    var fullName = req.body.fullName.trim();
+    var cityCountry = req.body.cityCountry.trim();
+    var gender = req.body.gender.trim();
+    var dateOfBirth= req.body.dateOfBirth.trim();
+    var profileUrl = url + '/' + req.file.path;
     user.email = email;
     user.fullName = fullName;
     user.cityCountry = cityCountry;
@@ -155,11 +151,9 @@ module.exports.editProfile = (req, res, next) => {
           message:'Edited Successfully'
         });
     });
-});
-
-
-
+})
 }
+
 module.exports.resetPassword = (req, res, next) => {
   if (!req.body.email) {
     return res

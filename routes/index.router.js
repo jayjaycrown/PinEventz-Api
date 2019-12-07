@@ -68,6 +68,7 @@ router.delete('/event/:Id', eventOwner, jwtHelper, ctrlUser.deleteEvents);
 router.get('/event/:Id', jwtHelper, ctrlUser.getEventsById);
 router.post('/event/:Id/comment', jwtHelper, ctrlUser.addComment);
 router.delete('/event/:Id/comment/:id', jwtHelper, ctrlUser.deleteComment);
+router.post('/event/:Id', jwtHelper, ctrlUser.pinEvent);
 
 function eventOwner(req,res,next) {
   if (req.isAuthenticated()) {
