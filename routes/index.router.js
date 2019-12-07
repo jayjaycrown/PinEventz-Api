@@ -36,6 +36,9 @@ const upload  = multer({
  // Authentication Section
 router.post('/register', ctrlUser.register);
 router.post('/login', ctrlUser.authenticate);
+router.post('/resetpassword', ctrlUser.resetPassword);
+router.post('/new-password', ctrlUser.NewPassword);
+router.post('/valid-password-token', ctrlUser.ValidPasswordToken);
 router.get('/logout',isLoggedIn, function(req, res, next) {
   req.logout();
    return res.status(200).json({message:'logout success'});
@@ -48,6 +51,7 @@ router.post('/editprofile', jwtHelper,upload.single('profileUrl'), ctrlUser.edit
 router.post('/interest',  ctrlUser.interest);
 router.get("/user",jwtHelper, ctrlUser.users);
 router.get('/user/:Id', jwtHelper, ctrlUser.singleUser);
+
 
 // Board section
 router.get('/board',jwtHelper, ctrlUser.getBoard);
