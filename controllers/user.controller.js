@@ -180,10 +180,10 @@ module.exports.resetPassword = (req, res, next) => {
         .status(409)
         .json({ message: 'Email does not exist' });
         }
-        console.log("user found id is" + user._id);
+        // console.log("user found id is" + user._id);
     var resettoken = new passwordResetToken({ _userId: user._id, resettoken: crypto.randomBytes(16).toString('hex') });
     resettoken.save(function (err) {
-    if (err) { return res.status(500).send({ msg:err.message }); }
+    if (err) { return res.status(500).send({ message:err.message }); }
     passwordResetToken.find({ _userId: user._id, resettoken: { $ne: resettoken.resettoken } }).remove().exec();
     res.status(200).json({ message: 'Reset Password link sent successfully.' });
     var transporter = nodemailer.createTransport({
@@ -204,9 +204,13 @@ module.exports.resetPassword = (req, res, next) => {
     }
     transporter.sendMail(mailOptions, (err, info) => {
       if(err)
-     console.log(err)
+      { return res.status(500).json({ message:err.message }); }
+     // console.log(err)
    else
-     console.log(info);
+   { return res.status(200).json({
+     message: "sent Successfully"
+    }); }
+     // console.log(info);
       })
     })
     })
@@ -351,7 +355,7 @@ module.exports.createBoard = (req, res, next) => {
   user: req.userData;
 const url = req.protocol + '://' + req.get('host')
   //const url = 'https://' + req.get('host')
-console.log(req.file);
+//console.log(req.file);
 // const url = req.protocol + '://' + req.get('host')
 // boardUrl = url + '/uploads/' + req.file.filename;
 
@@ -442,8 +446,8 @@ module.exports.getBoardById = (req, res, next) => {
     Board.findById(id)
     .exec()
     .then(doc=>{
-      console.log('user id:' + userId)
-      console.log('id in author:' +doc.creator[0].authorId);
+      //console.log('user id:' + userId)
+      //console.log('id in author:' +doc.creator[0].authorId);
        if(doc){
         //console.log(doc);
         res.status(200).json(doc);
@@ -467,8 +471,8 @@ module.exports.createEvent = (req, res, next) => {
     username: req.userData.fullName,
     id:req.userData.userId
   }
-  console.log(author);
-  console.log(req.file);
+  //console.log(author);
+  //console.log(req.file);
   const event = new Event ({
       eventName:req.body.eventName,
       address:req.body.address,
