@@ -8,6 +8,7 @@ var userSchema = new mongoose.Schema({
         required: 'Full name can\'t be empty',
         trim: true,
     },
+
     email:{
        type:String,
        required: 'Email can\'t be empty',
@@ -31,6 +32,12 @@ var userSchema = new mongoose.Schema({
         // trim: true,
         // unique: true,
     },
+    profileUrl: {
+        type: String
+    },
+    // prefix:{
+    // 	type:String,
+    // },
     dateOfBirth:{
     	type:String,
         require:true,

@@ -42,13 +42,12 @@ const upload  = multer({
 module.exports.register = (req, res, next) => {
     var user= new User({
         fullName:req.body.fullName,
-        username:req.body.username,
         email:req.body.email,
         password:req.body.password,
         cityCountry:req.body.cityCountry,
-        dateOfBirth:req.body.dateOfBirth,
+        //dateOfBirth:req.body.dateOfBirth,
         gender:req.body.gender,
-        checkbox:req.body.checkbox,
+        //checkbox:req.body.checkbox,
         created_dt:Date.now()
         // facebookProvider: {
         //   type: {
@@ -85,14 +84,16 @@ module.exports.authenticate = (req, res, next) => {
           const token = jwt.sign({
             email: user.email,
             userId: user._id,
-            fullName:user.fullName
+            fullName:user.fullName,
+            cityCountry:user.cityCountry,
+            gender:user.gender
           },
           process.env.JWT_SECRET,
            {
               expiresIn: process.env.JWT_EXP
            });
           return res.status(200).json({
-            message: "Authentication Successful: hello: " + user.email,
+            message: "Authentication Successful: hello: " + user.fullName,
             user: user,
             token: token,
             expiresIn: process.env.JWT_EXP
@@ -106,12 +107,76 @@ module.exports.authenticate = (req, res, next) => {
 }
 
 module.exports.userProfile = (req, res, next) =>{
-  res.status(200).json({
+  User.findById(req.userData.userId, function (err, user) {
+    if (!user) {
+       res.status(200).json({
+              message:'User not found'
+            });
+    } else {
+      res.status(200).json({
+        user: user
+      })
+    }
+  })
 
-    user: req.userData,
-    message: "successful: " + req.userData.fullName,
-  });
 }
+
+module.exports.editProfile = (req, res, next) => {
+
+  // User.find({ id: req.userData.userId})
+  // .updateMany({id:req.userData.userId},{email: req.body.email, fullName:req.body.fullName,dateOfBirth:req.body.dateOfBirth,
+  //   profileUrl: url + '/' + req.file.path,cityCountry:req.body.cityCountry,gender:req.body.gender},
+  // (err,user)=>{
+  //   if(!user){
+  //     res.status(200).json({
+  //       message:'User not found'
+  //     });
+  //   }
+  // })
+
+
+  User.findById(req.userData.userId, function (err, user) {
+
+    // todo: don't forget to handle err
+
+    if (!user) {
+      return res.status(200).json({
+              message:'User not found'
+            });
+    }
+    const url = req.protocol + '://' + req.get('host')
+
+    // good idea to trim
+    var email = req.body.email.trim();
+    var fullName = req.body.fullName.trim();
+    var cityCountry = req.body.cityCountry.trim();
+    var gender = req.body.gender.trim();
+    var dateOfBirth= req.body.dateOfBirth.trim();
+    var profileUrl = url + '/' + req.file.path;
+
+    user.email = email;
+    user.fullName = fullName;
+    user.cityCountry = cityCountry;
+    user.gender = gender;
+    user.dateOfBirth = dateOfBirth;
+    user.profileUrl = profileUrl;
+
+    // don't forget to save!
+    user.save(function (err) {
+
+        // todo: don't forget to handle err
+
+        res.status(200).json({
+                message:'Edited Successfully'
+              });
+    });
+});
+
+
+
+}
+
+
 module.exports.logout = (req, res, next) => {
   req.logout();
   res.status(200).json({
@@ -324,8 +389,8 @@ module.exports.createEvent = (req, res, next) => {
           return res.status(501).json(err);
       } else {
           return res.status(200).json({
-            result:result,
-            board: result.board,
+            //result:result,
+            //board: result.board,
             message:'You successfully create an event'
           });
       }
