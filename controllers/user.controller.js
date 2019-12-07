@@ -84,9 +84,7 @@ module.exports.authenticate = (req, res, next) => {
           const token = jwt.sign({
             email: user.email,
             userId: user._id,
-            fullName:user.fullName,
-            cityCountry:user.cityCountry,
-            gender:user.gender
+            fullName:user.fullName
           },
           process.env.JWT_SECRET,
            {
@@ -123,21 +121,7 @@ module.exports.userProfile = (req, res, next) =>{
 
 module.exports.editProfile = (req, res, next) => {
 
-  // User.find({ id: req.userData.userId})
-  // .updateMany({id:req.userData.userId},{email: req.body.email, fullName:req.body.fullName,dateOfBirth:req.body.dateOfBirth,
-  //   profileUrl: url + '/' + req.file.path,cityCountry:req.body.cityCountry,gender:req.body.gender},
-  // (err,user)=>{
-  //   if(!user){
-  //     res.status(200).json({
-  //       message:'User not found'
-  //     });
-  //   }
-  // })
-
-
   User.findById(req.userData.userId, function (err, user) {
-
-    // todo: don't forget to handle err
 
     if (!user) {
       return res.status(200).json({
@@ -146,7 +130,6 @@ module.exports.editProfile = (req, res, next) => {
     }
     const url = req.protocol + '://' + req.get('host')
 
-    // good idea to trim
     var email = req.body.email.trim();
     var fullName = req.body.fullName.trim();
     var cityCountry = req.body.cityCountry.trim();
@@ -395,6 +378,55 @@ module.exports.createEvent = (req, res, next) => {
           });
       }
   })
+
+}
+
+module.exports.editEvent = (req, res, next) => {
+
+  Event.findById( req.params.Id, function (err, event) {
+
+    if (!event) {
+      return res.status(200).json({
+              message:'Event Does not exist'
+            });
+    }
+    const url = req.protocol + '://' + req.get('host')
+      var eventName=req.body.eventName.trim();
+      var address=req.body.address.trim();
+      var shortDes=req.body.shortDes.trim();
+      var fullDes=req.body.fullDes.trim();
+      var startDate=req.body.startDate.trim();
+      var finishDate=req.body.finishDate.trim();
+      var board=req.body.board.trim();
+      var status=req.body.status.trim();
+      var category= req.body.category.trim();
+      var time=req.body.time.trim();
+      var eventUrl=url + '/' + req.file.path;
+
+    event.eventName = eventName;
+    event.address = address;
+    event.shortDes = shortDes;
+    event.fullDes = fullDes;
+    event.startDate = startDate;
+    event.finishDate = finishDate;
+    event.board = board;
+    event.status = status;
+    event.category = category;
+    event.time = time;
+    event.eventUrl = eventUrl;
+
+    // don't forget to save!
+    event.save(function (err) {
+
+        // todo: don't forget to handle err
+
+        res.status(200).json({
+                message:'Edited Successfully'
+              });
+    });
+});
+
+
 
 }
 

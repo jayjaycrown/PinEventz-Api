@@ -59,6 +59,7 @@ router.get('/board/:Id', jwtHelper, ctrlUser.getBoardById);
 // Event Section
 router.post('/event', jwtHelper,upload.single('eventUrl'), ctrlUser.createEvent);
 router.get('/event',jwtHelper, ctrlUser.getEvents);
+router.post('/editevent', jwtHelper,upload.single('eventUrl'), ctrlUser.editEvent);
 router.delete('/event/:Id', eventOwner, jwtHelper, ctrlUser.deleteEvents);
 router.get('/event/:Id', jwtHelper, ctrlUser.getEventsById);
 router.post('/event/:Id/comment', jwtHelper, ctrlUser.addComment);
