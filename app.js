@@ -9,12 +9,14 @@ const cors = require('cors');
 const passport = require('passport');
 const morgan = require('morgan');
 var cookieParser = require('cookie-parser')
+const compression = require('compression')
 
 const rtsIndex = require('./routes/index.router');
 const userIndex = require('./routes/user');
 const PORT = process.env.PORT || 5000
 
 var app = express();
+app.use(compression())
 
 // middleware
 app.use(morgan('dev'));
