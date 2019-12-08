@@ -147,7 +147,7 @@ module.exports.editProfile = (req, res, next) => {
       });
     }
     bcrypt.hash(req.body.password, 10, (err, hash) => {
-      const url = req.get('host');
+      const url = req.protocol + '://' + req.get('host');
     var email = req.body.email.trim();
     var fullName = req.body.fullName.trim();
     var cityCountry = req.body.cityCountry.trim();
@@ -362,7 +362,7 @@ module.exports.singleUser = (req, res, next) => {
 
 module.exports.createBoard = (req, res, next) => {
   user: req.userData;
-const url = req.get('host')
+const url = req.protocol + '://' + req.get('host')
   //const url = 'https://' + req.get('host')
 //console.log(req.file);
 // const url = req.protocol + '://' + req.get('host')
@@ -474,7 +474,7 @@ module.exports.getBoardById = (req, res, next) => {
 }
 
 module.exports.createEvent = (req, res, next) => {
-  const url = req.get('host')
+  const url = req.protocol + '://' + req.get('host')
   user: req.userData;
   const author = {
     username: req.userData.fullName,
@@ -523,7 +523,7 @@ module.exports.editEvent = (req, res, next) => {
         message:'Event Does not exist'
       });
     }
-      const url =  req.get('host');
+      const url = req.protocol + '://' + req.get('host');
       var eventName=req.body.eventName.trim();
       var address=req.body.address.trim();
       var shortDes=req.body.shortDes.trim();
