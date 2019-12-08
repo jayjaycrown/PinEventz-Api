@@ -16,7 +16,8 @@ const userIndex = require('./routes/user');
 const PORT = process.env.PORT || 5000
 
 var app = express();
-app.use(compression())
+app.use(compression());
+app.enable('trust proxy');
 
 // middleware
 app.use(morgan('dev'));
