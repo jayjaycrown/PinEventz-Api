@@ -4,6 +4,7 @@ const router = express.Router();
 const ctrlUser = require('../controllers/user.controller');
 
 const jwtHelper = require('../config/jwtHelper');
+const eventOwner= require('../config/eventOwner');
 
 const multer=require('multer');
 // Multer File upload settings
@@ -39,7 +40,7 @@ router.post('/login', ctrlUser.authenticate);
 router.post('/resetpassword', ctrlUser.resetPassword);
 router.post('/new-password', ctrlUser.NewPassword);
 router.post('/valid-password-token', ctrlUser.ValidPasswordToken);
-router.get('/logout',isLoggedIn, function(req, res, next) {
+router.get('/logout', function(req, res, next) {
   req.logout();
    return res.status(200).json({message:'logout success'});
 });
@@ -63,28 +64,13 @@ router.get('/board/:Id', jwtHelper, ctrlUser.getBoardById);
 // Event Section
 router.post('/event', jwtHelper,upload.single('eventUrl'), ctrlUser.createEvent);
 router.get('/event',jwtHelper, ctrlUser.getEvents);
-router.post('/editevent', jwtHelper,upload.single('eventUrl'), ctrlUser.editEvent);
-router.delete('/event/:Id', eventOwner, jwtHelper, ctrlUser.deleteEvents);
+router.put('/editevent/:Id', jwtHelper,upload.single('eventUrl'), ctrlUser.editEvent);
+router.delete('/event/:Id', jwtHelper, ctrlUser.deleteEvents);
 router.get('/event/:Id', jwtHelper, ctrlUser.getEventsById);
-router.post('/event/:Id/comment', jwtHelper, ctrlUser.addComment);
+router.post('/board/:Id/comment', jwtHelper, ctrlUser.addComment);
 router.delete('/event/:Id/comment/:id', jwtHelper, ctrlUser.deleteComment);
-router.post('/event/:Id', jwtHelper, ctrlUser.pinEvent);
+router.post('/event/:Id', jwtHelper, ctrlUser.Pinn);
 
-function eventOwner(req,res,next) {
-  if (req.isAuthenticated()) {
-       Event.findById(req.params.id, function (err,result) {
-         if (err) {
-           return res.status(501).json(err);
-         } else {
-           if (result.organizer.id.equals(req.userData.userId)) {
-           next();
-           } else {
-             console.log('Permission not granted');
-           }
-         }
-       })
-  }
-}
 
 function isLoggedIn(req, res, next) {
   if (req.isAuthenticated())

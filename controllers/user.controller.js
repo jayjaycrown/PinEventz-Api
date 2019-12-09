@@ -475,13 +475,8 @@ module.exports.getBoardById = (req, res, next) => {
 
 module.exports.createEvent = (req, res, next) => {
   const url = req.protocol + '://' + req.get('host')
-  user: req.userData;
-  const author = {
-    username: req.userData.fullName,
-    id:req.userData.userId
-  }
-  //console.log(author);
-  //console.log(req.file);
+  req.userData;
+
   const event = new Event ({
       eventName:req.body.eventName,
       address:req.body.address,
@@ -517,7 +512,9 @@ module.exports.createEvent = (req, res, next) => {
 module.exports.editEvent = (req, res, next) => {
 
   Event.findById( req.params.Id, function (err, event) {
-
+    if (err) {
+      res.status(501).json(err);
+    }
     if (!event) {
       return res.status(200).json({
         message:'Event Does not exist'
@@ -550,7 +547,11 @@ module.exports.editEvent = (req, res, next) => {
 
     // don't forget to save!
     event.save(function (err) {
-      // todo: don't forget to handle err
+      if(err){
+        return res.status(500).json({
+          message: "Something happened" + err
+        })
+      }
       res.status(200).json({
               message:'Edited Successfully'
             });
@@ -595,13 +596,14 @@ module.exports.getEventsById = (req, res, next) => {
 }
 
 module.exports.deleteEvents = (req, res, next) => {
+  const userid = req.userData.userId;
   const id = req.params.Id;
   Event.findByIdAndDelete(id)
   .exec()
   .then(doc=>{
      if(doc){
       res.status(200).json(
-       { message: "Board Deleted"}
+       { message: "Event Deleted"}
       );
      }else{
       res.status(200).json({
@@ -615,50 +617,85 @@ module.exports.deleteEvents = (req, res, next) => {
        });
     });
 }
+// module.exports.Pinn = (req, res, next) => {
+//   Event.findById(req.params.Id, function(error, doc) {
+//     if(error){
+//       return res.status(500).json({
+//         message: "Nooooooooooooo" + error,
+//     })
+//   } else {
+//     const boards = req.body.boardId;
+//     var Pinned =   doc;
+//     console.log(Pinned);
+//     Board.update(
+//       { _id: boards},
+//       { $push: { events: Pinned  } },
+//       function(err, success) {
+//         if (err) {
+//           // console.log(err);
+//           return res.status(501).json({
+//             message: err
+//           })
+//       }else {
+//         // console.log(success);
+//         return res.status(200).json({
+//           message: success
+//         })
+//     }
+//       }
+//     )
+//   }
 
-module.exports.pinEvent = (req, res, next) => {
-  Event.findById(req.params.Id, function (err, board) {
-    if (err) {
-      res.status(501).json(err);
+
+
+
+
+//   })
+// }
+module.exports.Pinn = (req, res, next) => {
+  Event.findById(req.params.Id, function( err, doc) {
+    if(err){
+      return res.status(501).json({
+        message: err,
+    })
     } else {
-      if (err) {
-        res.status(501).json(err);
-      } else {
-        Pinned.create(
-          {
-            pin:req.body.pin,
-            user_id:req.userData.userId,
+      const boards = req.body.boardId;
+      Board.findById(boards, function(error, board){
+        if(error){
+          return res.status(501).json({
+            message: "No 2: " + error,
+          })
+        }else {
+          Pinned.create({
+            eventUrl: doc.eventUrl,
+            startDate: doc.startDate,
+            finishDate: doc.finishDate,
+            status: doc.status,
+            category: doc.category,
+            time: doc.time,
+            organizer: doc.organizer,
             created_dt:Date.now(),
-          },  function (err, pinned) {
-          if (err) {
-             res.status(501).json(err);
-          } else {
-            pinned.save();
-            board.events.push(pinned);
-            board.save()
-            return res.status(200).json({
-              result:event,
-              message:'You have successfully push event to board'
-            });
-          }
-        })
-      }
-    //   event.create(function (err) {
-    //     if (err) {
-    //         return res.status(501).json(err);
-    //     } else {
-    //         return res.status(200).json({
-    //           result:result,
-    //           message:'You successfully create an event'
-    //         });
-    //     }
-    // })
-    // board.event.push(event);
+          },function (error, pinned){
+            if(error){
+              return res.status(501).json({
+                message: "No 3 :" + error,
+              })
+            } else{
+              //console.log(doc)
+              pinned.save()
+              board.pinneds.push(pinned)
+              board.save()
+              return res.status(200).json({
+                result:board,
+                message:'You have successfully pushed event to board'
+              });
+            }
+          })
+        }
+      })
     }
   })
-
 }
-
 module.exports.addComment =(req, res, next) => {
   Event.findById(req.params.Id, function (err,event) {
     if (err) {
@@ -674,6 +711,7 @@ module.exports.addComment =(req, res, next) => {
         if (err) {
            res.status(501).json(err);
         } else {
+          //console.log(comment)
           comment.save();
           event.comments.push(comment);
           event.save()
@@ -709,3 +747,50 @@ module.exports.deleteComment = (req, res, next) => {
        });
     });
 }
+
+
+
+
+
+// module.exports.pinEvent = (req, res, next) => {
+//   Event.findById(req.params.Id, function (err, board) {
+//     if (err) {
+//       res.status(501).json(err);
+//     } else {
+//       if (err) {
+//         res.status(501).json(err);
+//       } else {
+//         Pinned.create(
+//           {
+//             pin:req.body.pin,
+//             user_id:req.userData.userId,
+//             created_dt:Date.now(),
+//           },  function (err, pinned) {
+//           if (err) {
+//              res.status(501).json(err);
+//           } else {
+//             pinned.save();
+//             board.events.push(pinned);
+//             board.save()
+//             return res.status(200).json({
+//               result:event,
+//               message:'You have successfully pinned event to board'
+//             });
+//           }
+//         })
+//       }
+//     //   event.create(function (err) {
+//     //     if (err) {
+//     //         return res.status(501).json(err);
+//     //     } else {
+//     //         return res.status(200).json({
+//     //           result:result,
+//     //           message:'You successfully create an event'
+//     //         });
+//     //     }
+//     // })
+//     // board.event.push(event);
+//     }
+//   })
+
+// }

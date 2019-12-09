@@ -1,4 +1,5 @@
 const mongoose=require('mongoose');
+const Schema=mongoose.Schema
 
 var BoardSchema = new mongoose.Schema({
     boardName:{
@@ -17,20 +18,19 @@ var BoardSchema = new mongoose.Schema({
     boardStatus:{
         type:String,
     },
-    created_dt:{
-        type:Date,
-    	require:true
-    },
     creator:[{username : String, authorId: String}],
 
-    // Event added to a board start
-    events: [
+
+    comments: [
         {
-            type: mongoose.Schema.Types.ObjectId,
-            ref:  "Event"
+            type: mongoose.Schema.ObjectId,
+            ref: "Comment"
         }
-    ]
-    // Event added to a board ends
+   ],
+   created_dt:{
+    type:Date,
+    require:true
+}
 });
 
 module.exports = mongoose.model('Board', BoardSchema);
