@@ -617,85 +617,52 @@ module.exports.deleteEvents = (req, res, next) => {
        });
     });
 }
-// module.exports.Pinn = (req, res, next) => {
-//   Event.findById(req.params.Id, function(error, doc) {
-//     if(error){
-//       return res.status(500).json({
-//         message: "Nooooooooooooo" + error,
-//     })
-//   } else {
-//     const boards = req.body.boardId;
-//     var Pinned =   doc;
-//     console.log(Pinned);
-//     Board.update(
-//       { _id: boards},
-//       { $push: { events: Pinned  } },
-//       function(err, success) {
-//         if (err) {
-//           // console.log(err);
-//           return res.status(501).json({
-//             message: err
-//           })
-//       }else {
-//         // console.log(success);
-//         return res.status(200).json({
-//           message: success
-//         })
-//     }
-//       }
-//     )
-//   }
 
-
-
-
-
-//   })
-// }
 module.exports.Pinn = (req, res, next) => {
-  Event.findById(req.params.Id, function( err, doc) {
-    if(err){
-      return res.status(501).json({
-        message: err,
-    })
-    } else {
-      const boards = req.body.boardId;
-      Board.findById(boards, function(error, board){
-        if(error){
-          return res.status(501).json({
-            message: "No 2: " + error,
-          })
-        }else {
-          Pinned.create({
-            eventUrl: doc.eventUrl,
-            startDate: doc.startDate,
-            finishDate: doc.finishDate,
-            status: doc.status,
-            category: doc.category,
-            time: doc.time,
-            organizer: doc.organizer,
-            created_dt:Date.now(),
-          },function (error, pinned){
-            if(error){
-              return res.status(501).json({
-                message: "No 3 :" + error,
-              })
-            } else{
-              //console.log(doc)
-              pinned.save()
-              board.pinneds.push(pinned)
-              board.save()
-              return res.status(200).json({
-                result:board,
-                message:'You have successfully pushed event to board'
-              });
-            }
-          })
-        }
+  Event.findById(req.params.Id)
+  .exec()
+  .then(doc => {
+    const boards = req.body.boardId;
+    Board.findById(boards)
+    .exec()
+    .then(board => {
+      board.events.push(doc)
+      board.save()
+      return res.status(200).json({
+        message: "Event pinned to board Successfully",
+        // result: board
       })
     }
-  })
+    )
+    .catch(error => {
+      return res.status(501).json({
+        message: "Something Happened: " +error
+    })
+    })
+
+    })
+    .catch(err => {
+      return res.status(500).json({
+        message: "Not Connecting" + err
+      })
+    })
 }
+
+module.exports.getPinnedById = (req, res, next) => {
+  const id = req.params.Id;
+  Pinned.findById(id)
+    .exec()
+    .then(doc=>{
+      return res.status(200).json(doc);
+      })
+      .catch(err=>{
+       return res.status(500).json({
+            error:err
+         });
+      });
+}
+
+
 module.exports.addComment =(req, res, next) => {
   Event.findById(req.params.Id, function (err,event) {
     if (err) {

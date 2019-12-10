@@ -67,9 +67,10 @@ router.get('/event',jwtHelper, ctrlUser.getEvents);
 router.put('/editevent/:Id', jwtHelper,upload.single('eventUrl'), ctrlUser.editEvent);
 router.delete('/event/:Id', jwtHelper, ctrlUser.deleteEvents);
 router.get('/event/:Id', jwtHelper, ctrlUser.getEventsById);
-router.post('/board/:Id/comment', jwtHelper, ctrlUser.addComment);
+router.post('/event/:Id/comment', jwtHelper, ctrlUser.addComment);
 router.delete('/event/:Id/comment/:id', jwtHelper, ctrlUser.deleteComment);
 router.post('/event/:Id', jwtHelper, ctrlUser.Pinn);
+router.get('/pinned/:Id', jwtHelper, ctrlUser.getPinnedById);
 
 
 function isLoggedIn(req, res, next) {

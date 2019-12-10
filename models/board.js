@@ -21,7 +21,7 @@ var BoardSchema = new mongoose.Schema({
     creator:[{username : String, authorId: String}],
 
 
-    comments: [
+    events: [
         {
             type: mongoose.Schema.ObjectId,
             ref: "Comment"

@@ -2,8 +2,15 @@ const mongoose=require('mongoose');
 const Schema=mongoose.Schema
 
 const PinnedSchema=mongoose.Schema({
+    eventId: {
+        type: String,
+    },
     eventUrl:{
     	type:String,
+    },
+    eventName:{
+    	type:String,
+        require:true,
     },
     startDate:{
     	type:String,
