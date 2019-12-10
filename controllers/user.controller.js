@@ -512,61 +512,64 @@ module.exports.createEvent = (req, res, next) => {
 
 module.exports.editEvent = (req, res, next) => {
   const userId = req.userData.userId
-  const eventId = req.params.id
-  if(userId === eventId) {
-    Event.findById( req.params.Id, function (err, event) {
-      if (err) {
-        res.status(501).json(err);
-      }
-      if (!event) {
-        return res.status(200).json({
-          message:'Event Does not exist'
-        });
-      }
-        const url = req.protocol + '://' + req.get('host');
-        var eventName=req.body.eventName.trim();
-        var address=req.body.address.trim();
-        var shortDes=req.body.shortDes.trim();
-        var fullDes=req.body.fullDes.trim();
-        var startDate=req.body.startDate.trim();
-        var finishDate=req.body.finishDate.trim();
-        var board=req.body.board.trim();
-        var status=req.body.status.trim();
-        var category= req.body.category.trim();
-        var time=req.body.time.trim();
-        var eventUrl=url + '/' + req.file.path;
 
-      event.eventName = eventName;
-      event.address = address;
-      event.shortDes = shortDes;
-      event.fullDes = fullDes;
-      event.startDate = startDate;
-      event.finishDate = finishDate;
-      event.board = board;
-      event.status = status;
-      event.category = category;
-      event.time = time;
-      event.eventUrl = eventUrl;
+  Event.findById( req.params.Id, function (err, event) {
+    if (err) {
+      res.status(501).json(err);
+    }
+    if (!event) {
+      return res.status(404).json({
+        message:'Event Does not exist'
+      });
+    }
+    const orgId = event.organizer[0].id
+    if(userId === orgId) {
+      const url = req.protocol + '://' + req.get('host');
+      var eventName=req.body.eventName.trim();
+      var address=req.body.address.trim();
+      var shortDes=req.body.shortDes.trim();
+      var fullDes=req.body.fullDes.trim();
+      var startDate=req.body.startDate.trim();
+      var finishDate=req.body.finishDate.trim();
+      var board=req.body.board.trim();
+      var status=req.body.status.trim();
+      var category= req.body.category.trim();
+      var time=req.body.time.trim();
+      var eventUrl=url + '/' + req.file.path;
 
-      // don't forget to save!
-      event.save(function (err) {
-        if(err){
-          return res.status(500).json({
-            message: "Something happened" + err
-          })
-        }
-        res.status(200).json({
-                message:'Edited Successfully'
-              });
-    });
+    event.eventName = eventName;
+    event.address = address;
+    event.shortDes = shortDes;
+    event.fullDes = fullDes;
+    event.startDate = startDate;
+    event.finishDate = finishDate;
+    event.board = board;
+    event.status = status;
+    event.category = category;
+    event.time = time;
+    event.eventUrl = eventUrl;
+
+    // don't forget to save!
+    event.save(function (err) {
+      if(err){
+        return res.status(500).json({
+          message: "Something happened" + err
+        })
+      }
+      res.status(200).json({
+              message:'Edited Successfully'
+            });
   });
 
+    } else {
+      res.status(501).json({
+        message: "You're not authorized"
+      });
+    }
 
-  } else {
-    res.status(501).json({
-      message: "You're not authorized"
-    });
-  }
+});
+
+
 
 
 }
