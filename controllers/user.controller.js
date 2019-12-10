@@ -198,17 +198,17 @@ module.exports.resetPassword = (req, res, next) => {
     var transporter = nodemailer.createTransport({
       service: 'Gmail',
       auth: {
-        user: 'pineventzltd@gmail.com',
-        pass: 'PinEventz2019'
+        user: 'pineventz19@gmail.com',
+        pass: 'pinEventz001'
       }
     });
     var mailOptions = {
     to: user.email,
-    from: 'pineventzltd@gmail.com',
+    from: 'pineventz19@gmail.com',
     subject: 'PinEventz Password Reset',
     text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
     'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
-    'http://localhost:4200/response-reset-password/' + resettoken.resettoken + '\n\n' +
+    'https://pin-eventz.herokuapp.com/response-reset-password/' + resettoken.resettoken + '\n\n' +
     'If you did not request this, please ignore this email and your password will remain unchanged.\n'
     }
     transporter.sendMail(mailOptions, (err, info) => {
@@ -348,7 +348,7 @@ module.exports.singleUser = (req, res, next) => {
        if(doc){
         res.status(200).json(doc);
        }else{
-        res.status(200).json({
+        res.status(404).json({
           message:'Invalid Id Number'
         });
        }
@@ -451,8 +451,9 @@ module.exports.deleteBoard = (req, res, next) => {
 
 module.exports.getBoardById = (req, res, next) => {
   const id = req.params.Id;
-  const userId = req.userData.userId;
+  // const userId = req.userData.userId;
     Board.findById(id)
+    //.populate("events")
     .exec()
     .then(doc=>{
       //console.log('user id:' + userId)
@@ -510,54 +511,62 @@ module.exports.createEvent = (req, res, next) => {
 }
 
 module.exports.editEvent = (req, res, next) => {
-
-  Event.findById( req.params.Id, function (err, event) {
-    if (err) {
-      res.status(501).json(err);
-    }
-    if (!event) {
-      return res.status(200).json({
-        message:'Event Does not exist'
-      });
-    }
-      const url = req.protocol + '://' + req.get('host');
-      var eventName=req.body.eventName.trim();
-      var address=req.body.address.trim();
-      var shortDes=req.body.shortDes.trim();
-      var fullDes=req.body.fullDes.trim();
-      var startDate=req.body.startDate.trim();
-      var finishDate=req.body.finishDate.trim();
-      var board=req.body.board.trim();
-      var status=req.body.status.trim();
-      var category= req.body.category.trim();
-      var time=req.body.time.trim();
-      var eventUrl=url + '/' + req.file.path;
-
-    event.eventName = eventName;
-    event.address = address;
-    event.shortDes = shortDes;
-    event.fullDes = fullDes;
-    event.startDate = startDate;
-    event.finishDate = finishDate;
-    event.board = board;
-    event.status = status;
-    event.category = category;
-    event.time = time;
-    event.eventUrl = eventUrl;
-
-    // don't forget to save!
-    event.save(function (err) {
-      if(err){
-        return res.status(500).json({
-          message: "Something happened" + err
-        })
+  const userId = req.userData.userId
+  const eventId = req.params.id
+  if(userId === eventId) {
+    Event.findById( req.params.Id, function (err, event) {
+      if (err) {
+        res.status(501).json(err);
       }
-      res.status(200).json({
-              message:'Edited Successfully'
-            });
-  });
-});
+      if (!event) {
+        return res.status(200).json({
+          message:'Event Does not exist'
+        });
+      }
+        const url = req.protocol + '://' + req.get('host');
+        var eventName=req.body.eventName.trim();
+        var address=req.body.address.trim();
+        var shortDes=req.body.shortDes.trim();
+        var fullDes=req.body.fullDes.trim();
+        var startDate=req.body.startDate.trim();
+        var finishDate=req.body.finishDate.trim();
+        var board=req.body.board.trim();
+        var status=req.body.status.trim();
+        var category= req.body.category.trim();
+        var time=req.body.time.trim();
+        var eventUrl=url + '/' + req.file.path;
 
+      event.eventName = eventName;
+      event.address = address;
+      event.shortDes = shortDes;
+      event.fullDes = fullDes;
+      event.startDate = startDate;
+      event.finishDate = finishDate;
+      event.board = board;
+      event.status = status;
+      event.category = category;
+      event.time = time;
+      event.eventUrl = eventUrl;
+
+      // don't forget to save!
+      event.save(function (err) {
+        if(err){
+          return res.status(500).json({
+            message: "Something happened" + err
+          })
+        }
+        res.status(200).json({
+                message:'Edited Successfully'
+              });
+    });
+  });
+
+
+  } else {
+    res.status(501).json({
+      message: "You're not authorized"
+    });
+  }
 
 
 }
@@ -583,8 +592,9 @@ module.exports.getEventsById = (req, res, next) => {
        if(doc){
         res.status(200).json(doc);
        }else{
-        res.status(200).json({
-          message:'Event not Found'
+        res.status(404).json({
+          message:'Event not Found',
+          status: 404
         });
        }
       })
@@ -598,7 +608,8 @@ module.exports.getEventsById = (req, res, next) => {
 module.exports.deleteEvents = (req, res, next) => {
   const userid = req.userData.userId;
   const id = req.params.Id;
-  Event.findByIdAndDelete(id)
+  if(userid === id){
+    Event.findByIdAndDelete(id)
   .exec()
   .then(doc=>{
      if(doc){
@@ -616,6 +627,12 @@ module.exports.deleteEvents = (req, res, next) => {
           error:err
        });
     });
+  } else {
+    return res.status(500).json({
+      message: " You're not authorized"
+    })
+  }
+
 }
 
 module.exports.Pinn = (req, res, next) => {
@@ -647,7 +664,12 @@ module.exports.Pinn = (req, res, next) => {
       })
     })
 }
-
+module.exports.Unpin = (req, res, next) => {
+  Board.findById(rq.params.id)
+  .exec()
+  .then()
+  .catch()
+}
 module.exports.getPinnedById = (req, res, next) => {
   const id = req.params.Id;
   Pinned.findById(id)
