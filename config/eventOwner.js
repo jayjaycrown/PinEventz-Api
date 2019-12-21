@@ -5,11 +5,11 @@ module.exports =(req, res, next) => {
     .exec()
     .then(result => {
        console.log(result)
-      //   if (result.organizer[0]._id.equals(req.userData.userId)) {
+         if (result.organizer[0]._id.equals(req.userData.userId)) {
           next();
-      //   } else {
-      //     console.log('Permission not granted');
-      //   }
+         } else {
+           console.log('Permission not granted');
+         }
 
     })
 } catch (error) {

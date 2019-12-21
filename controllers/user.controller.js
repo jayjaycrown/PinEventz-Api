@@ -7,7 +7,8 @@ const User = require('../models/user.model')
 const Board = require('../models/board');
 const Event = require('../models/event');
 const Comment = require('../models/comment');
-const Pinned = require('../models/pinnedEvent')
+const Pinned = require('../models/pinnedEvent');
+const Ticket = require('../models/ticket');
 const nodemailer = require('nodemailer');
 const hbs = require('nodemailer-express-handlebars');
 const bcrypt = require('bcryptjs');
@@ -330,12 +331,12 @@ module.exports.users = (req, res, next) => {
   User.find()
   .select()
   .exec()
-        .then(result => {
-                return res.status(200).json(result);
-        })
-        .catch(err => {
-            res.status(500).json(err);
-          })
+  .then(result => {
+          return res.status(200).json(result);
+  })
+  .catch(err => {
+      res.status(500).json(err);
+    })
 }
 
 
@@ -429,24 +430,34 @@ module.exports.getBoard = (req, res, next) => {
 }
 module.exports.deleteBoard = (req, res, next) => {
   const id = req.params.Id;
-  Board.findByIdAndDelete(id)
+  const userid = req.userData.userId;
+
+  Board.findById(id)
   .exec()
-  .then(doc=>{
-     if(doc){
-      res.status(200).json(
-       { message: "Board Deleted"}
-      );
-     }else{
-      res.status(200).json({
-        message:'Invalid Id Number'
-      });
-     }
-    })
-    .catch(err=>{
-      res.status(500).json({
-          error:err
-       });
-    });
+  .then(board => {
+    const creator = board.creator[0].authorId
+    if(creator === userid) {
+      Board.findByIdAndDelete(id)
+      .exec()
+      .then(doc=>{
+         if(doc){
+          res.status(200).json(
+           { message: "Board Deleted"}
+          );
+         }else{
+          res.status(500).json({
+            message:'Invalid Id Number'
+          });
+         }
+        })
+        .catch(err=>{
+          res.status(501).json({
+              error:err
+           });
+        });
+    }
+  })
+  .catch()
 }
 
 module.exports.getBoardById = (req, res, next) => {
@@ -563,7 +574,7 @@ module.exports.editEvent = (req, res, next) => {
 
     } else {
       res.status(501).json({
-        message: "You're not authorized"
+        message: "Access Denied"
       });
     }
 
@@ -573,7 +584,51 @@ module.exports.editEvent = (req, res, next) => {
 
 
 }
+module.exports.deleteEvents = (req, res, next) => {
+  const userid = req.userData.userId;
+  const id = req.params.Id;
+  Event.findById(id)
+  .exec()
+  .then(doc => {
+    const orgId = doc.organizer[0].id
+    if(userid === orgId){
+      Event.findByIdAndDelete(id)
+      .exec()
+      .then(doc=>{
+         if(doc){
+          res.status(200).json(
+           { message: "Event Deleted"}
+          );
+         }else{
+          res.status(404).json({
+            message:'Error occured'
+          });
+         }
+        })
+        .catch(err=>{
+          res.status(500).json({
+              error:err
+           });
+        });
+    } else {
+      return res.status(500).json({
+        message: " You're not authorized"
+      })
+    }
+  })
+  .catch(
+    err => {
+      return res.status(404).json({
+        message: "Event not found",
+        error: err
+      })
+    }
 
+  )
+
+
+
+}
 
 module.exports.getEvents = (req, res, next) => {
   Event.find()
@@ -608,45 +663,38 @@ module.exports.getEventsById = (req, res, next) => {
       });
 }
 
-module.exports.deleteEvents = (req, res, next) => {
-  const userid = req.userData.userId;
-  const id = req.params.Id;
-  if(userid === id){
-    Event.findByIdAndDelete(id)
-  .exec()
-  .then(doc=>{
-     if(doc){
-      res.status(200).json(
-       { message: "Event Deleted"}
-      );
-     }else{
-      res.status(200).json({
-        message:'Invalid Id Number'
-      });
-     }
-    })
-    .catch(err=>{
-      res.status(500).json({
-          error:err
-       });
-    });
-  } else {
-    return res.status(500).json({
-      message: " You're not authorized"
-    })
-  }
 
-}
 
 module.exports.Pinn = (req, res, next) => {
   Event.findById(req.params.Id)
   .exec()
   .then(doc => {
+    Pinned.create({
+      pinner: req.userData.userId,
+      eventUrl: doc.eventUrl,
+      startDate: doc.startDate,
+      eventName: doc.eventName,
+      finishDate: doc.finishDate,
+      status: doc.status,
+      category: doc.category,
+      time: doc.time,
+      organizer: doc.organizer,
+      created_dt:Date.now(),
+    })
+    .then(pinned => {
+      pinned.save()
+    }).catch(
+      error => {
+        return res.status(500).json({
+          message: error
+        })
+      }
+    )
     const boards = req.body.boardId;
     Board.findById(boards)
     .exec()
     .then(board => {
-      board.events.push(doc)
+      board.events.addToSet(doc)
       board.save()
       return res.status(200).json({
         message: "Event pinned to board Successfully",
@@ -663,16 +711,33 @@ module.exports.Pinn = (req, res, next) => {
     })
     .catch(err => {
       return res.status(500).json({
-        message: "Not Connecting" + err
+        message: "Not Connecting: " + err
       })
     })
 }
 module.exports.Unpin = (req, res, next) => {
-  Board.findById(rq.params.id)
-  .exec()
-  .then()
-  .catch()
+  const boards = req.params.id;
+  const event = req.body.eventId;
+  Board.findOneAndUpdate(
+    { _id: req.params.id},
+    { $pull: { events: [event]  } },
+    function(err, success) {
+      if (err) {
+        console.log(err);
+        return res.status(501).json({
+          message: err
+        })
+    }else {
+      console.log(success);
+      return res.status(200).json({
+        message: "Pulled Successfully",
+        success: success
+      })
+  }
+    }
+  )
 }
+
 module.exports.getPinnedById = (req, res, next) => {
   const id = req.params.Id;
   Pinned.findById(id)
@@ -687,7 +752,37 @@ module.exports.getPinnedById = (req, res, next) => {
       });
 }
 
-
+module.exports.buyTicket = (req, res, next) => {
+  Event.findById(req.params.id)
+  .exec()
+  .then(event => {
+    Ticket.create({
+      eventId: event._id,
+      purchasedBy: req.userData.userId,
+      attendeeName: req.params.name,
+      attendeeEmail: req.params.email,
+      created_dt:Date.now()
+    }).then(ticket => {
+      ticket.save()
+      event.tickets.addToSet(ticket);
+      event.save();
+      return res.status(200).json({
+        message: 'Ticket generated Successfully'
+      })
+    }).catch(
+      error => {
+        return res.status(500).json({
+          error: error
+        })
+      }
+    )
+  })
+  .catch(err => {
+    return res.status(501).json({
+      error: err
+    })
+  })
+}
 module.exports.addComment =(req, res, next) => {
   Event.findById(req.params.Id, function (err,event) {
     if (err) {
@@ -728,13 +823,13 @@ module.exports.deleteComment = (req, res, next) => {
        { message: "Comment Deleted"}
       );
      }else{
-      res.status(200).json({
+      res.status(500).json({
         message:'Invalid Id Number'
       });
      }
     })
     .catch(err=>{
-      res.status(500).json({
+      res.status(501).json({
           error:err
        });
     });

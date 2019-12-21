@@ -47,6 +47,12 @@ var EventSchema=mongoose.Schema({
               ref: "Comment"
           }
      ],
+     tickets: [
+        {
+            type: mongoose.Schema.ObjectId,
+            ref: "Ticket"
+        }
+   ],
     created_dt:{
         type:Date,
     	require:true

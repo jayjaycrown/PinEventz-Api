@@ -59,6 +59,7 @@ router.get('/board',jwtHelper, ctrlUser.getBoard);
 router.post('/board', jwtHelper,upload.single('boardUrl'), ctrlUser.createBoard);
 router.delete('/board/:Id', jwtHelper, ctrlUser.deleteBoard);
 router.get('/board/:Id', jwtHelper, ctrlUser.getBoardById);
+router.put('/board/:Id', jwtHelper, ctrlUser.Unpin);
 //router.get('/myboard', jwtHelper, ctrlUser.getMyBoard);
 
 // Event Section
@@ -70,6 +71,7 @@ router.get('/event/:Id', jwtHelper, ctrlUser.getEventsById);
 router.post('/event/:Id/comment', jwtHelper, ctrlUser.addComment);
 router.delete('/event/:Id/comment/:id', jwtHelper, ctrlUser.deleteComment);
 router.post('/event/:Id', jwtHelper, ctrlUser.Pinn);
+router.post('/event/:Id/ticket', jwtHelper, ctrlUser.buyTicket);
 router.get('/pinned/:Id', jwtHelper, ctrlUser.getPinnedById);
 
 

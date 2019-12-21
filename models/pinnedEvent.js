@@ -5,6 +5,9 @@ const PinnedSchema=mongoose.Schema({
     eventId: {
         type: String,
     },
+    pinner: {
+        type: String
+    },
     eventUrl:{
     	type:String,
     },
