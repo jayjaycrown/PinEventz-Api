@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const ticketSchema = new mongoose.Schema({
+const ticketSchema =  mongoose.Schema({
     eventId: {
       type: String,
       required: true
