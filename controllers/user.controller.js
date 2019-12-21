@@ -753,33 +753,33 @@ module.exports.getPinnedById = (req, res, next) => {
 }
 
 module.exports.buyTicket = (req, res, next) => {
-  Event.findById(req.params.id)
+  Event.findById(req.params.Id)
   .exec()
   .then(event => {
     Ticket.create({
       eventId: event._id,
       purchasedBy: req.userData.userId,
-      attendeeName: req.params.name,
-      attendeeEmail: req.params.email,
+      attendeeName: req.body.name,
+      attendeeEmail: req.body.email,
       created_dt:Date.now()
     }).then(ticket => {
       ticket.save()
       event.tickets.addToSet(ticket);
       event.save();
       return res.status(200).json({
-        message: 'Ticket generated Successfully'
+        message: 'Ticket has been generated successfully'
       })
     }).catch(
       error => {
         return res.status(500).json({
-          error: error
+          message: error
         })
       }
     )
   })
   .catch(err => {
     return res.status(501).json({
-      error: err
+      message: err
     })
   })
 }
