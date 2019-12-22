@@ -71,7 +71,7 @@ router.get('/event/:Id', jwtHelper, ctrlUser.getEventsById);
 router.post('/event/:Id/comment', jwtHelper, ctrlUser.addComment);
 router.delete('/event/:Id/comment/:id', jwtHelper, ctrlUser.deleteComment);
 router.post('/event/:Id', jwtHelper, ctrlUser.Pinn);
-//router.post('/event/:Id/ticket', jwtHelper, ctrlUser.buyTicket);
+router.post('/event/:Id/ticket', jwtHelper, ctrlUser.buyTicket);
 router.get('/pinned/:Id', jwtHelper, ctrlUser.getPinnedById);
 
 
