@@ -13,11 +13,7 @@ const hbs = require('nodemailer-express-handlebars');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const passwordResetToken = require('../models/resettoken');
-<<<<<<< HEAD
 const Ticket = require('../models/ticket');
-=======
-//var sgTransport = require('nodemailer-sendgrid-transport');
->>>>>>> 5b7e114503c9ff7adef24690f1031a6291db1626
 
 
 const multer = require('multer');
@@ -483,31 +479,31 @@ module.exports.deleteBoard = (req, res, next) => {
   const userid = req.userData.userId;
 
   Board.findById(id)
-  .exec()
-  .then(board => {
-    const creator = board.creator[0].authorId
-    if(creator === userid) {
-      Board.findByIdAndDelete(id)
-      .exec()
-      .then(doc=>{
-         if(doc){
-          res.status(200).json(
-           { message: "Board Deleted"}
-          );
-         }else{
-          res.status(500).json({
-            message:'Invalid Id Number'
+    .exec()
+    .then(board => {
+      const creator = board.creator[0].authorId
+      if (creator === userid) {
+        Board.findByIdAndDelete(id)
+          .exec()
+          .then(doc => {
+            if (doc) {
+              res.status(200).json({
+                message: "Board Deleted"
+              });
+            } else {
+              res.status(500).json({
+                message: 'Invalid Id Number'
+              });
+            }
+          })
+          .catch(err => {
+            res.status(501).json({
+              error: err
+            });
           });
-         }
-        })
-        .catch(err=>{
-          res.status(501).json({
-              error:err
-           });
-        });
-    }
-  })
-  .catch()
+      }
+    })
+    .catch()
 }
 
 module.exports.getBoardById = (req, res, next) => {
@@ -574,53 +570,53 @@ module.exports.createEvent = (req, res, next) => {
 module.exports.editEvent = (req, res, next) => {
   const userId = req.userData.userId
 
-  Event.findById( req.params.Id, function (err, event) {
+  Event.findById(req.params.Id, function (err, event) {
     if (err) {
       res.status(501).json(err);
     }
     if (!event) {
       return res.status(404).json({
-        message:'Event Does not exist'
+        message: 'Event Does not exist'
       });
     }
     const orgId = event.organizer[0].id
-    if(userId === orgId) {
+    if (userId === orgId) {
       const url = req.protocol + '://' + req.get('host');
-      var eventName=req.body.eventName.trim();
-      var address=req.body.address.trim();
-      var shortDes=req.body.shortDes.trim();
-      var fullDes=req.body.fullDes.trim();
-      var startDate=req.body.startDate.trim();
-      var finishDate=req.body.finishDate.trim();
-      var board=req.body.board.trim();
-      var status=req.body.status.trim();
-      var category= req.body.category.trim();
-      var time=req.body.time.trim();
-      var eventUrl=url + '/' + req.file.path;
+      var eventName = req.body.eventName.trim();
+      var address = req.body.address.trim();
+      var shortDes = req.body.shortDes.trim();
+      var fullDes = req.body.fullDes.trim();
+      var startDate = req.body.startDate.trim();
+      var finishDate = req.body.finishDate.trim();
+      var board = req.body.board.trim();
+      var status = req.body.status.trim();
+      var category = req.body.category.trim();
+      var time = req.body.time.trim();
+      var eventUrl = url + '/' + req.file.path;
 
-    event.eventName = eventName;
-    event.address = address;
-    event.shortDes = shortDes;
-    event.fullDes = fullDes;
-    event.startDate = startDate;
-    event.finishDate = finishDate;
-    event.board = board;
-    event.status = status;
-    event.category = category;
-    event.time = time;
-    event.eventUrl = eventUrl;
+      event.eventName = eventName;
+      event.address = address;
+      event.shortDes = shortDes;
+      event.fullDes = fullDes;
+      event.startDate = startDate;
+      event.finishDate = finishDate;
+      event.board = board;
+      event.status = status;
+      event.category = category;
+      event.time = time;
+      event.eventUrl = eventUrl;
 
-    // don't forget to save!
-    event.save(function (err) {
-      if(err){
-        return res.status(500).json({
-          message: "Something happened" + err
-        })
-      }
-      res.status(200).json({
-              message:'Edited Successfully'
-            });
-  });
+      // don't forget to save!
+      event.save(function (err) {
+        if (err) {
+          return res.status(500).json({
+            message: "Something happened" + err
+          })
+        }
+        res.status(200).json({
+          message: 'Edited Successfully'
+        });
+      });
 
     } else {
       res.status(501).json({
@@ -628,7 +624,7 @@ module.exports.editEvent = (req, res, next) => {
       });
     }
 
-});
+  });
 
 
 
@@ -730,22 +726,26 @@ module.exports.Pinn = (req, res, next) => {
 module.exports.Unpin = (req, res, next) => {
   const boards = req.params.id;
   const event = req.body.eventId;
-  Board.findOneAndUpdate(
-    { _id: req.params.id},
-    { $pull: { events: [event]  } },
-    function(err, success) {
+  Board.findOneAndUpdate({
+      _id: req.params.id
+    }, {
+      $pull: {
+        events: [event]
+      }
+    },
+    function (err, success) {
       if (err) {
         console.log(err);
         return res.status(501).json({
           message: err
         })
-    }else {
-      console.log(success);
-      return res.status(200).json({
-        message: "Pulled Successfully",
-        success: success
-      })
-  }
+      } else {
+        console.log(success);
+        return res.status(200).json({
+          message: "Pulled Successfully",
+          success: success
+        })
+      }
     }
   )
 }
@@ -765,34 +765,34 @@ module.exports.getPinnedById = (req, res, next) => {
 
 module.exports.buyTicket = (req, res, next) => {
   Event.findById(req.params.Id)
-  .exec()
-  .then(event => {
-    Ticket.create({
-      eventId: event._id,
-      purchasedBy: req.userData.userId,
-      attendeeName: req.body.name,
-      attendeeEmail: req.body.email,
-      created_dt:Date.now()
-    }).then(ticket => {
-      ticket.save()
-      event.tickets.addToSet(ticket);
-      event.save();
-      return res.status(200).json({
-        message: 'Ticket has been generated Successfully'
-      })
-    }).catch(
-      error => {
-        return res.status(500).json({
-          message: error
+    .exec()
+    .then(event => {
+      Ticket.create({
+        eventId: event._id,
+        purchasedBy: req.userData.userId,
+        attendeeName: req.body.name,
+        attendeeEmail: req.body.email,
+        created_dt: Date.now()
+      }).then(ticket => {
+        ticket.save()
+        event.tickets.addToSet(ticket);
+        event.save();
+        return res.status(200).json({
+          message: 'Ticket has been generated Successfully'
         })
-      }
-    )
-  })
-  .catch(err => {
-    return res.status(501).json({
-      message: err
+      }).catch(
+        error => {
+          return res.status(500).json({
+            message: error
+          })
+        }
+      )
     })
-  })
+    .catch(err => {
+      return res.status(501).json({
+        message: err
+      })
+    })
 }
 
 module.exports.addComment = (req, res, next) => {
