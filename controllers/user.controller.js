@@ -14,7 +14,7 @@ const hbs = require('nodemailer-express-handlebars');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const passwordResetToken = require('../models/resettoken');
-var sgTransport = require('nodemailer-sendgrid-transport');
+//var sgTransport = require('nodemailer-sendgrid-transport');
 
 
 const multer=require('multer');
