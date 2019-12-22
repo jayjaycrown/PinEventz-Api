@@ -13,7 +13,11 @@ const hbs = require('nodemailer-express-handlebars');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const passwordResetToken = require('../models/resettoken');
+<<<<<<< HEAD
 const Ticket = require('../models/ticket');
+=======
+//var sgTransport = require('nodemailer-sendgrid-transport');
+>>>>>>> 5b7e114503c9ff7adef24690f1031a6291db1626
 
 
 const multer = require('multer');
