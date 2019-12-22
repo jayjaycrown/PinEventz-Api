@@ -10,11 +10,9 @@ const ticketSchema =  mongoose.Schema({
     },
     attendeeName:{
       type: String,
-      required: true
     },
     attendeeEmail: {
       type: String,
-      required: true
     },
     created_dt:{
       type:Date,
