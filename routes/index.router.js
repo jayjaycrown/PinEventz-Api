@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const ctrlUser = require('../controllers/user.controller');
+const ctrlAdmin = require('../controllers/admin.controller');
 
 const jwtHelper = require('../config/jwtHelper');
 const eventOwner= require('../config/eventOwner');
@@ -73,6 +74,12 @@ router.delete('/event/:Id/comment/:id', jwtHelper, ctrlUser.deleteComment);
 router.post('/event/:Id', jwtHelper, ctrlUser.Pinn);
 router.post('/event/:Id/ticket', jwtHelper, ctrlUser.buyTicket);
 router.get('/pinned/:Id', jwtHelper, ctrlUser.getPinnedById);
+
+
+// Admin Activities section start
+router.get('/getAllUsers', ctrlAdmin.getAllUsers);
+router.get('/getSingleUser/:Id', ctrlAdmin.getSingleUser);
+router.delete('/deleteSingleUser/:Id', ctrlAdmin.deleteSingleUser);
 
 
 function isLoggedIn(req, res, next) {

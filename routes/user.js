@@ -56,7 +56,6 @@ router.get('', function(req, res, next) {
 // Router to create interest by admin
 router.post('/interest',   function (req,res) {
   const token = req.body.jwt;
-  console.log('token: ' + token);
   const x = jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
       if (err) throw err;
       console.log(decoded);
